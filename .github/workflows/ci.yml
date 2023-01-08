@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  #push:
+    #branches: [ master ]
+    #paths-ignore:
+      #- 'README.md'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: "Build"
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1
+      - name: Build
+        shell: cmd
+        run: |
+          cd v2rayN
+          msbuild --restore
+          msbuild v2rayN.sln /m /p:Configuration=Release /p:WebProjectOutputDir=D:\a\v2rayN\v2rayN\v2rayN\output /p:OutputPath=D:\a\v2rayN\v2rayN\v2rayN\output\bin /p:Platform="Any CPU"
+      - name: Upload
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: "v2rayN"
+          path: D:\a\v2rayN\v2rayN\v2rayN\output\
