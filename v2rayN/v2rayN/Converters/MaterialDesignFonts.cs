@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Windows.Media;
 
 namespace v2rayN.Converters
@@ -11,7 +10,7 @@ namespace v2rayN.Converters
         static MaterialDesignFonts()
         {
             var fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Fonts\");
-            MyFont = new FontFamily(new Uri($"file:///{fontPath}"), "./#微软雅黑");
+            MyFont = new FontFamily(new Uri($"file:///{fontPath}"), "./#Source Han Sans CN");
         }
     }
 }
