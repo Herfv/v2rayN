@@ -71,6 +71,7 @@ namespace v2rayN.Views
                 this.BindCommand(ViewModel, vm => vm.AddServerViaScanCmd, v => v.menuAddServerViaScan).DisposeWith(disposables);
 
                 //servers delete
+                this.BindCommand(ViewModel, vm => vm.EditServerCmd, v => v.menuEditServer).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.RemoveServerCmd, v => v.menuRemoveServer).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.RemoveDuplicateServerCmd, v => v.menuRemoveDuplicateServer).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.CopyServerCmd, v => v.menuCopyServer).DisposeWith(disposables);
@@ -240,7 +241,14 @@ namespace v2rayN.Views
 
         private void LstProfiles_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            ViewModel?.EditServer(false, EConfigType.Custom);
+            if (_config.uiItem.doubleClick2Activate)
+            {
+                ViewModel?.SetDefaultServer();
+            }
+            else
+            {
+                ViewModel?.EditServer(false, EConfigType.Custom);
+            }
         }
 
         private void LstProfiles_ColumnHeader_Click(object sender, RoutedEventArgs e)
@@ -323,6 +331,10 @@ namespace v2rayN.Views
                     ViewModel?.Export2ShareUrl();
                 }
                 else if (e.Key == Key.D)
+                {
+                    ViewModel?.EditServer(false, EConfigType.Custom);
+                }
+                else if (e.Key == Key.F)
                 {
                     ViewModel?.ShareServer();
                 }

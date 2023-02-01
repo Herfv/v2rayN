@@ -84,6 +84,7 @@ namespace v2rayN.ViewModels
         public ReactiveCommand<Unit, Unit> AddServerViaClipboardCmd { get; }
         public ReactiveCommand<Unit, Unit> AddServerViaScanCmd { get; }
         //servers delete
+        public ReactiveCommand<Unit, Unit> EditServerCmd { get; }
         public ReactiveCommand<Unit, Unit> RemoveServerCmd { get; }
         public ReactiveCommand<Unit, Unit> RemoveDuplicateServerCmd { get; }
         public ReactiveCommand<Unit, Unit> CopyServerCmd { get; }
@@ -293,6 +294,10 @@ namespace v2rayN.ViewModels
                 return ScanScreenTaskAsync();
             });
             //servers delete
+            EditServerCmd = ReactiveCommand.Create(() =>
+            {
+                EditServer(false, EConfigType.Custom);
+            }, canEditRemove);
             RemoveServerCmd = ReactiveCommand.Create(() =>
             {
                 RemoveServer();
@@ -555,7 +560,16 @@ namespace v2rayN.ViewModels
                                 item.totalDown = Utils.HumanFy(update.totalDown);
                                 item.totalUp = Utils.HumanFy(update.totalUp);
 
-                                _profileItems.Replace(item, Utils.DeepCopy(item));
+                                if (SelectedProfile?.indexId == item.indexId)
+                                {
+                                    var temp = Utils.DeepCopy(item);
+                                    _profileItems.Replace(item, temp);
+                                    SelectedProfile = temp;
+                                }
+                                else
+                                {
+                                    _profileItems.Replace(item, Utils.DeepCopy(item));
+                                }
                             }
                         }
                     }
@@ -684,6 +698,8 @@ namespace v2rayN.ViewModels
             List<ProfileItemModel> lstModel = LazyConfig.Instance.ProfileItems(_subId, _serverFilter);
             _lstProfile = Utils.FromJson<List<ProfileItem>>(Utils.ToJson(lstModel));
 
+            ConfigHandler.SetDefaultServer(_config, _lstProfile);
+
             List<ServerStatItem> lstServerStat = new();
             if (_statistics != null && _statistics.Enable)
             {
@@ -704,7 +720,7 @@ namespace v2rayN.ViewModels
                             network = t.network,
                             streamSecurity = t.streamSecurity,
                             subRemarks = t.subRemarks,
-                            isActive = t.isActive,
+                            isActive = t.indexId == _config.indexId,
                             delay = t.delay,
                             delayVal = t.delay != 0 ? $"{t.delay} {Global.DelayUnit}" : string.Empty,
                             speedVal = t.speed != 0 ? $"{t.speed} {Global.SpeedUnit}" : string.Empty,
@@ -714,15 +730,21 @@ namespace v2rayN.ViewModels
                             totalUp = t22 == null ? "" : Utils.HumanFy(t22.totalUp)
                         }).ToList();
 
-            ConfigHandler.SetDefaultServer(_config, _lstProfile);
-
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 _profileItems.Clear();
                 _profileItems.AddRange(lstModel);
                 if (lstModel.Count > 0)
                 {
-                    SelectedProfile = lstModel[0];
+                    var selected = lstModel.FirstOrDefault(t => t.indexId == _config.indexId);
+                    if (selected != null)
+                    {
+                        SelectedProfile = selected;
+                    }
+                    else
+                    {
+                        SelectedProfile = lstModel[0];
+                    }
                 }
 
                 RefreshServersMenu();
@@ -913,7 +935,7 @@ namespace v2rayN.ViewModels
 
         public void SetDefaultServer()
         {
-            if (Utils.IsNullOrEmpty(SelectedProfile.indexId))
+            if (Utils.IsNullOrEmpty(SelectedProfile?.indexId))
             {
                 return;
             }
@@ -1134,7 +1156,7 @@ namespace v2rayN.ViewModels
             if (sb.Length > 0)
             {
                 Utils.SetClipboardData(sb.ToString());
-                _noticeHandler?.Enqueue(ResUI.BatchExportURLSuccessfully);
+                _noticeHandler?.SendMessage(ResUI.BatchExportURLSuccessfully);
             }
         }
 
@@ -1159,7 +1181,7 @@ namespace v2rayN.ViewModels
             if (sb.Length > 0)
             {
                 Utils.SetClipboardData(Utils.Base64Encode(sb.ToString()));
-                _noticeHandler?.Enqueue(ResUI.BatchExportSubscriptionSuccessfully);
+                _noticeHandler?.SendMessage(ResUI.BatchExportSubscriptionSuccessfully);
             }
         }
 

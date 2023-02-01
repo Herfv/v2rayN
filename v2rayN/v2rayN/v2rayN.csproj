@@ -9,7 +9,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ApplicationIcon>v2rayN.ico</ApplicationIcon>
 		<Copyright>Copyright © 2017-2023 (GPLv3)</Copyright>
-		<FileVersion>6.6</FileVersion>
+		<FileVersion>6.7</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>		
@@ -102,7 +102,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Resources\Fonts\微软雅黑-Regular.ttf">
+	  <None Update="Resources\Fonts\SourceHanSansCN-Regular.ttf">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
