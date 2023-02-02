@@ -591,7 +591,8 @@ namespace v2rayN.ViewModels
         {
             if (Utils.IsNullOrEmpty(indexId))
             {
-                _noticeHandler?.SendMessage(delay);
+                _noticeHandler?.SendMessage(delay, true);
+                _noticeHandler?.Enqueue(delay);
                 return;
             }
             var item = _profileItems.Where(it => it.indexId == indexId).FirstOrDefault();
@@ -904,12 +905,16 @@ namespace v2rayN.ViewModels
             {
                 return;
             }
+            var exists = lstSelecteds.Exists(t => t.indexId == _config.indexId);
 
             ConfigHandler.RemoveServer(_config, lstSelecteds);
             _noticeHandler?.Enqueue(ResUI.OperationSuccess);
 
             RefreshServers();
-            Reload();
+            if (exists)
+            {
+                Reload();
+            }
         }
 
         private void RemoveDuplicateServer()
@@ -1034,7 +1039,7 @@ namespace v2rayN.ViewModels
             }
             (new UpdateHandle()).RunAvailabilityCheck((bool success, string msg) =>
             {
-                _noticeHandler?.SendMessage(msg);
+                _noticeHandler?.SendMessage(msg, true);
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
                     if (!Global.ShowInTaskbar)

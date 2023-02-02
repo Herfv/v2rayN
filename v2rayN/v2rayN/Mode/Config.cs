@@ -90,10 +90,14 @@
         /// <summary>
         /// 是否允许不安全连接
         /// </summary>
-        public bool defAllowInsecure
-        {
-            get; set;
-        }
+        public bool defAllowInsecure { get; set; }
+
+        public string defFingerprint { get; set; }
+
+        /// <summary>
+        /// 默认用户代理
+        /// </summary>
+        public string defUserAgent { get; set; }
 
         /// <summary>
         /// 域名解析策略
