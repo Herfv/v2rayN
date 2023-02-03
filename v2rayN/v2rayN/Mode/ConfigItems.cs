@@ -62,8 +62,10 @@ namespace v2rayN.Mode
         public bool colorModeDark { get; set; }
         public string? colorPrimaryName { get; set; }
         public string currentLanguage { get; set; }
+        public string currentFontFamily { get; set; }
         public bool enableDragDropSort { get; set; }
         public bool doubleClick2Activate { get; set; }
+        public bool autoHideStartup { get; set; } = true;
         public Dictionary<string, int> mainLvColWidth { get; set; }
     }
 

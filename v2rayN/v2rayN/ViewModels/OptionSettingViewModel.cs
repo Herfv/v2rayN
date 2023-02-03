@@ -62,6 +62,8 @@ namespace v2rayN.ViewModels
         [Reactive] public int autoUpdateInterval { get; set; }
         [Reactive] public int autoUpdateSubInterval { get; set; }
         [Reactive] public int trayMenuServersLimit { get; set; }
+        [Reactive] public string currentFontFamily { get; set; }
+
         #endregion
 
         #region System proxy
@@ -139,13 +141,15 @@ namespace v2rayN.ViewModels
             IgnoreGeoUpdateCore = _config.ignoreGeoUpdateCore;
             EnableAutoAdjustMainLvColWidth = _config.uiItem.enableAutoAdjustMainLvColWidth;
             EnableSecurityProtocolTls13 = _config.enableSecurityProtocolTls13;
-            AutoHideStartup = _config.autoHideStartup;
+            AutoHideStartup = _config.uiItem.autoHideStartup;
             EnableCheckPreReleaseUpdate = _config.checkPreReleaseUpdate;
             EnableDragDropSort = _config.uiItem.enableDragDropSort;
             DoubleClick2Activate = _config.uiItem.doubleClick2Activate;
             autoUpdateInterval = _config.autoUpdateInterval;
             autoUpdateSubInterval = _config.autoUpdateSubInterval;
             trayMenuServersLimit = _config.trayMenuServersLimit;
+            currentFontFamily = _config.uiItem.currentFontFamily;
+
             #endregion
 
             #region System proxy
@@ -305,13 +309,14 @@ namespace v2rayN.ViewModels
             _config.ignoreGeoUpdateCore = IgnoreGeoUpdateCore;
             _config.uiItem.enableAutoAdjustMainLvColWidth = EnableAutoAdjustMainLvColWidth;
             _config.enableSecurityProtocolTls13 = EnableSecurityProtocolTls13;
-            _config.autoHideStartup = AutoHideStartup;
+            _config.uiItem.autoHideStartup = AutoHideStartup;
             _config.autoUpdateInterval = autoUpdateInterval;
             _config.autoUpdateSubInterval = autoUpdateSubInterval;
             _config.checkPreReleaseUpdate = EnableCheckPreReleaseUpdate;
             _config.uiItem.enableDragDropSort = EnableDragDropSort;
             _config.uiItem.doubleClick2Activate = DoubleClick2Activate;
             _config.trayMenuServersLimit = trayMenuServersLimit;
+            _config.uiItem.currentFontFamily = currentFontFamily;
 
             //systemProxy
             _config.systemProxyExceptions = systemProxyExceptions;
