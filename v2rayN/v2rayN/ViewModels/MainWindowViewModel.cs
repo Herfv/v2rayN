@@ -189,6 +189,8 @@ namespace v2rayN.ViewModels
         public IObservableCollection<Swatch> Swatches => _swatches;
         [Reactive]
         public Swatch SelectedSwatch { get; set; }
+        [Reactive]
+        public int CurrentFontSize { get; set; }
 
         [Reactive]
         public string CurrentLanguage { get; set; }
@@ -259,7 +261,7 @@ namespace v2rayN.ViewModels
               x => x.EnableTun,
                y => y == true)
                   .Subscribe(c => DoEnableTun(c));
-           
+
             BindingUI();
             RestoreUI();
             AutoHideStartup();
@@ -535,7 +537,12 @@ namespace v2rayN.ViewModels
             _noticeHandler?.SendMessage(msg);
             if (success)
             {
+                RefreshServers();
                 Reload();
+                if (_config.uiItem.enableAutoAdjustMainLvColWidth)
+                {
+                    _updateView("AdjustMainLvColWidth");
+                }
             }
         }
         private void UpdateStatisticsHandler(ServerSpeedItem update)
@@ -1218,21 +1225,8 @@ namespace v2rayN.ViewModels
         }
 
         private void UpdateSubscriptionProcess(string subId, bool blProxy)
-        {
-            void _updateUI(bool success, string msg)
-            {
-                _noticeHandler?.SendMessage(msg);
-                if (success)
-                {
-                    RefreshServers();
-                    if (_config.uiItem.enableAutoAdjustMainLvColWidth)
-                    {
-                        _updateView("AdjustMainLvColWidth");
-                    }
-                }
-            };
-
-            (new UpdateHandle()).UpdateSubscriptionProcess(_config, subId, blProxy, _updateUI);
+        {         
+            (new UpdateHandle()).UpdateSubscriptionProcess(_config, subId, blProxy, UpdateTaskHandler);
         }
 
         #endregion
@@ -1576,6 +1570,7 @@ namespace v2rayN.ViewModels
             {
                 SelectedSwatch = _swatches.FirstOrDefault(t => t.Name == _config.uiItem.colorPrimaryName);
             }
+            CurrentFontSize = _config.uiItem.currentFontSize;
             CurrentLanguage = _config.uiItem.currentLanguage;
 
             this.WhenAnyValue(
@@ -1610,6 +1605,23 @@ namespace v2rayN.ViewModels
                          ConfigHandler.SaveConfig(ref _config);
                      }
                  });
+
+            this.WhenAnyValue(
+               x => x.CurrentFontSize,
+               y => y > 0)
+                  .Subscribe(c =>
+                  {
+                      if (CurrentFontSize >= Global.MinFontSize)
+                      {
+                          _config.uiItem.currentFontSize = CurrentFontSize;
+                          double size = (long)CurrentFontSize;
+                          Application.Current.Resources["StdFontSize"] = size;
+                          Application.Current.Resources["StdFontSize1"] = size + 2;
+                          Application.Current.Resources["StdFontSize2"] = size + 4;
+
+                          ConfigHandler.SaveConfig(ref _config);
+                      }
+                  });
 
             this.WhenAnyValue(
              x => x.CurrentLanguage,
