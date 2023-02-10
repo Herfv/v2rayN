@@ -339,7 +339,11 @@
                         VerticalAlignment="Center"
                         ClipToBounds="True"
                         Style="{StaticResource MaterialDesignToolBar}">
-                        <ListBox x:Name="lstGroup" Style="{StaticResource MaterialDesignChoiceChipPrimaryOutlineListBox}">
+                        <ListBox
+                            x:Name="lstGroup"
+                            FontSize="{DynamicResource StdFontSize}"
+                            ItemContainerStyle="{StaticResource MyChipListBoxItem}"
+                            Style="{StaticResource MaterialDesignChoiceChipPrimaryOutlineListBox}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding remarks}" />
@@ -350,15 +354,15 @@
                             x:Name="btnAddSub"
                             Width="30"
                             Height="30"
-                            Margin="8,0"
+                            Margin="4,0"
                             Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}">
                             <materialDesign:PackIcon Kind="Plus" />
                         </Button>
                         <Separator />
                         <TextBox
                             x:Name="txtServerFilter"
-                            Width="200"
-                            Margin="8,0"
+                            Width="100"
+                            Margin="4,0"
                             materialDesign:HintAssist.Hint="{x:Static resx:ResUI.MsgServerTitle}"
                             materialDesign:TextFieldAssist.HasClearButton="True"
                             Style="{StaticResource DefTextBox}" />

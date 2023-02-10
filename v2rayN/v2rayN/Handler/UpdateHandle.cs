@@ -278,11 +278,13 @@ namespace v2rayN.Handler
                             string fileName = Utils.GetTempPath(Utils.GetDownloadFileName(url));
                             if (File.Exists(fileName))
                             {
-                                Global.coreTypes.ForEach(it =>
-                                {
-                                    string targetPath = Utils.GetBinPath($"{geoName}.dat", (ECoreType)Enum.Parse(typeof(ECoreType), it));
-                                    File.Copy(fileName, targetPath, true);
-                                });
+                                //Global.coreTypes.ForEach(it =>
+                                //{
+                                //    string targetPath = Utils.GetBinPath($"{geoName}.dat", (ECoreType)Enum.Parse(typeof(ECoreType), it));
+                                //    File.Copy(fileName, targetPath, true);
+                                //});
+                                string targetPath = Utils.GetBinPath($"{geoName}.dat");
+                                File.Copy(fileName, targetPath, true);
 
                                 File.Delete(fileName);
                                 //_updateFunc(true, "");
@@ -326,7 +328,7 @@ namespace v2rayN.Handler
                 var coreInfo = LazyConfig.Instance.GetCoreInfo(type);
                 string url = coreInfo.coreReleaseApiUrl;
 
-                var result = await (new DownloadHandle()).DownloadStringAsync(url, true, "");
+                var result = await (new DownloadHandle()).DownloadStringAsyncOri(url, true, "");
                 if (!Utils.IsNullOrEmpty(result))
                 {
                     responseHandler(type, result, preRelease);

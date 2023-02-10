@@ -70,11 +70,6 @@ namespace v2rayN.Handler
                 Utils.SetSecurityProtocol(LazyConfig.Instance.GetConfig().enableSecurityProtocolTls13);
                 UpdateCompleted?.Invoke(this, new ResultEventArgs(false, ResUI.Downloading));
 
-                var client = new HttpClient(new SocketsHttpHandler()
-                {
-                    Proxy = GetWebProxy(blProxy)
-                });
-
                 var progress = new Progress<double>();
                 progress.ProgressChanged += (sender, value) =>
                 {
@@ -85,12 +80,12 @@ namespace v2rayN.Handler
                     }
                 };
 
-                var cancellationToken = new CancellationTokenSource();
-                _ = HttpClientHelper.GetInstance().DownloadFileAsync(client,
-                       url,
-                       Utils.GetTempPath(Utils.GetDownloadFileName(url)),
-                       progress,
-                       cancellationToken.Token);
+                var webProxy = GetWebProxy(blProxy);
+                _ = DownloaderHelper.Instance.DownloadFileAsync(webProxy,
+                    url,
+                    Utils.GetTempPath(Utils.GetDownloadFileName(url)),
+                    progress,
+                    downloadTimeout);
             }
             catch (Exception ex)
             {
@@ -131,6 +126,32 @@ namespace v2rayN.Handler
         /// </summary> 
         /// <param name="url"></param>
         public async Task<string> DownloadStringAsync(string url, bool blProxy, string userAgent)
+        {
+            try
+            {
+                Utils.SetSecurityProtocol(LazyConfig.Instance.GetConfig().enableSecurityProtocolTls13);
+
+                var webProxy = GetWebProxy(blProxy);
+                var result = await DownloaderHelper.Instance.DownloadStringAsync(webProxy, url, userAgent, 30);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Utils.SaveLog(ex.Message, ex);
+                Error?.Invoke(this, new ErrorEventArgs(ex));
+                if (ex.InnerException != null)
+                {
+                    Error?.Invoke(this, new ErrorEventArgs(ex.InnerException));
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// DownloadString
+        /// </summary> 
+        /// <param name="url"></param>
+        public async Task<string> DownloadStringAsyncOri(string url, bool blProxy, string userAgent)
         {
             try
             {
