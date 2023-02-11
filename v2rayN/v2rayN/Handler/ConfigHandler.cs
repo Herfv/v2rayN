@@ -43,18 +43,17 @@ namespace v2rayN.Handler
             if (config == null)
             {
                 config = new Config
+                {                   
+                };
+            }
+            if (config.coreBasicItem == null)
+            {
+                config.coreBasicItem = new()
                 {
                     logEnabled = false,
                     loglevel = "warning",
 
-                    //Mux
                     muxEnabled = false,
-
-                    enableStatistics = false,
-
-                    statisticsFreshRate = 1,
-
-                    enableRoutingAdvanced = true
                 };
             }
 
@@ -87,10 +86,17 @@ namespace v2rayN.Handler
                     config.inbound[0].protocol = Global.InboundSocks;
                 }
             }
-            //路由规则
-            if (Utils.IsNullOrEmpty(config.domainStrategy))
+            if (config.routingBasicItem == null)
             {
-                config.domainStrategy = Global.domainStrategys[0];//"IPIfNonMatch";
+                config.routingBasicItem = new()
+                {
+                    enableRoutingAdvanced = true
+                };
+            }  
+            //路由规则
+            if (Utils.IsNullOrEmpty(config.routingBasicItem.domainStrategy))
+            {
+                config.routingBasicItem.domainStrategy = Global.domainStrategys[0];//"IPIfNonMatch";
             }
             //if (Utils.IsNullOrEmpty(config.domainMatcher))
             //{
@@ -130,6 +136,14 @@ namespace v2rayN.Handler
                     mtu = 9000,
                 };
             }
+            if (config.guiItem == null)
+            {
+                config.guiItem = new()
+                {
+                    enableStatistics = false,
+                    statisticsFreshRate = 1,
+                };
+            }
             if (config.uiItem == null)
             {
                 config.uiItem = new UIItem()
@@ -144,7 +158,7 @@ namespace v2rayN.Handler
             if (Utils.IsNullOrEmpty(config.uiItem.currentLanguage))
             {
                 config.uiItem.currentLanguage = Global.Languages[0];
-            }
+            }          
 
             if (config.constItem == null)
             {
@@ -176,9 +190,9 @@ namespace v2rayN.Handler
                 config.speedTestItem.speedPingTestUrl = Global.SpeedPingTestUrl;
             }
 
-            if (config.statisticsFreshRate > 100 || config.statisticsFreshRate < 1)
+            if (config.guiItem.statisticsFreshRate > 100 || config.guiItem.statisticsFreshRate < 1)
             {
-                config.statisticsFreshRate = 1;
+                config.guiItem.statisticsFreshRate = 1;
             }
 
             if (config == null)
@@ -296,21 +310,46 @@ namespace v2rayN.Handler
                 SqliteHelper.Instance.Replace(routing);
             }
 
-            config = Utils.FromJson<Config>(Utils.ToJson(configOld));
-            if (config.tunModeItem == null)
+            config = Utils.FromJson<Config>(Utils.ToJson(configOld));          
+
+            if (config.coreBasicItem == null)
             {
-                config.tunModeItem = new TunModeItem
+                config.coreBasicItem = new()
                 {
-                    enableTun = false,
-                    showWindow = true,
-                    mtu = 9000,
+                    logEnabled = configOld.logEnabled,
+                    loglevel = configOld.loglevel,
+                    muxEnabled = configOld.muxEnabled,
+                };
+            }             
+        
+            if (config.routingBasicItem == null)
+            {
+                config.routingBasicItem = new()
+                {
+                    enableRoutingAdvanced = configOld.enableRoutingAdvanced,
+                    domainStrategy = configOld.domainStrategy
+                };
+            }
+
+            if (config.guiItem == null)
+            {
+                config.guiItem = new()
+                {
+                    enableStatistics = configOld.enableStatistics,
+                    statisticsFreshRate = configOld.statisticsFreshRate,
+                    keepOlderDedupl = configOld.keepOlderDedupl,
+                    ignoreGeoUpdateCore = configOld.ignoreGeoUpdateCore,
+                    autoUpdateInterval = configOld.autoUpdateInterval,
+                    checkPreReleaseUpdate = configOld.checkPreReleaseUpdate,
+                    enableSecurityProtocolTls13 = configOld.enableSecurityProtocolTls13,
+                    trayMenuServersLimit = configOld.trayMenuServersLimit,
                 };
             }
 
             GetDefaultServer(ref config);
             GetDefaultRouting(ref config);
             SaveConfig(ref config);
-            LazyConfig.Instance.SetConfig(ref config);
+            LoadConfig(ref config);
 
             return 0;
         }
@@ -647,7 +686,7 @@ namespace v2rayN.Handler
             }
             if (Utils.IsNullOrEmpty(profileItem.allowInsecure))
             {
-                profileItem.allowInsecure = config.defAllowInsecure.ToString().ToLower();
+                profileItem.allowInsecure = config.coreBasicItem.defAllowInsecure.ToString().ToLower();
             }
 
             AddServerCommon(ref config, profileItem);
@@ -754,7 +793,7 @@ namespace v2rayN.Handler
         public static int DedupServerList(ref Config config, ref List<ProfileItem> lstProfile)
         {
             List<ProfileItem> source = lstProfile;
-            bool keepOlder = config.keepOlderDedupl;
+            bool keepOlder = config.guiItem.keepOlderDedupl;
 
             List<ProfileItem> list = new List<ProfileItem>();
             if (!keepOlder) source.Reverse(); // Remove the early items first
@@ -781,7 +820,7 @@ namespace v2rayN.Handler
             profileItem.configVersion = 2;
             if (Utils.IsNullOrEmpty(profileItem.allowInsecure))
             {
-                profileItem.allowInsecure = config.defAllowInsecure.ToString().ToLower();
+                profileItem.allowInsecure = config.coreBasicItem.defAllowInsecure.ToString().ToLower();
             }
             if (!Utils.IsNullOrEmpty(profileItem.network) && !Global.networks.Contains(profileItem.network))
             {
@@ -1446,7 +1485,7 @@ namespace v2rayN.Handler
         {
             if (SqliteHelper.Instance.Table<RoutingItem>().Where(t => t.id == routingItem.id).Count() > 0)
             {
-                config.routingIndexId = routingItem.id;
+                config.routingBasicItem.routingIndexId = routingItem.id;
             }
 
             Global.reloadCore = true;
@@ -1457,7 +1496,7 @@ namespace v2rayN.Handler
         }
         public static RoutingItem GetDefaultRouting(ref Config config)
         {
-            var item = LazyConfig.Instance.GetRoutingItem(config.routingIndexId);
+            var item = LazyConfig.Instance.GetRoutingItem(config.routingBasicItem.routingIndexId);
             if (item is null)
             {
                 var item2 = SqliteHelper.Instance.Table<RoutingItem>().FirstOrDefault(t => t.locked == false);

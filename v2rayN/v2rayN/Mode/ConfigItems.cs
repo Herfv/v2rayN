@@ -3,6 +3,37 @@
 namespace v2rayN.Mode
 {
     [Serializable]
+    public class CoreBasicItem
+    {
+        /// <summary>
+        /// 允许日志
+        /// </summary>
+        public bool logEnabled { get; set; }
+
+        /// <summary>
+        /// 日志等级
+        /// </summary>
+        public string loglevel { get; set; }
+
+        /// <summary>
+        /// 允许Mux多路复用
+        /// </summary>
+        public bool muxEnabled { get; set; }
+
+        /// <summary>
+        /// 是否允许不安全连接
+        /// </summary>
+        public bool defAllowInsecure { get; set; }
+
+        public string defFingerprint { get; set; }
+
+        /// <summary>
+        /// 默认用户代理
+        /// </summary>
+        public string defUserAgent { get; set; }
+    }
+
+    [Serializable]
     public class InItem
     {
         public int localPort { get; set; }
@@ -52,6 +83,30 @@ namespace v2rayN.Mode
     }
 
     [Serializable]
+    public class GUIItem
+    {
+        public bool autoRun { get; set; }
+
+        public bool enableStatistics { get; set; }
+
+        public int statisticsFreshRate { get; set; }
+
+        public bool keepOlderDedupl { get; set; }
+
+        public bool ignoreGeoUpdateCore { get; set; } = true;
+
+        public int autoUpdateInterval { get; set; } = 10;
+
+        public int autoUpdateSubInterval { get; set; } = 10;
+
+        public bool checkPreReleaseUpdate { get; set; } = false;
+
+        public bool enableSecurityProtocolTls13 { get; set; }
+
+        public int trayMenuServersLimit { get; set; } = 20;
+    }
+
+    [Serializable]
     public class UIItem
     {
         public bool enableAutoAdjustMainLvColWidth { get; set; }
@@ -67,6 +122,7 @@ namespace v2rayN.Mode
         public bool enableDragDropSort { get; set; }
         public bool doubleClick2Activate { get; set; }
         public bool autoHideStartup { get; set; } = true;
+        public string mainMsgFilter { get; set; }
         public Dictionary<string, int> mainLvColWidth { get; set; }
     }
 
@@ -125,4 +181,15 @@ namespace v2rayN.Mode
 
     }
 
+    [Serializable]
+    public class RoutingBasicItem
+    {
+        /// <summary>
+        /// 域名解析策略
+        /// </summary>
+        public string domainStrategy { get; set; }
+        public string domainMatcher { get; set; }
+        public string routingIndexId { get; set; }
+        public bool enableRoutingAdvanced { get; set; }
+    }
 }

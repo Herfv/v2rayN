@@ -73,29 +73,29 @@ namespace v2rayN.Handler
             {
                 if (blExport)
                 {
-                    if (config.logEnabled)
+                    if (config.coreBasicItem.logEnabled)
                     {
-                        v2rayConfig.log.loglevel = config.loglevel;
+                        v2rayConfig.log.loglevel = config.coreBasicItem.loglevel;
                     }
                     else
                     {
-                        v2rayConfig.log.loglevel = config.loglevel;
+                        v2rayConfig.log.loglevel = config.coreBasicItem.loglevel;
                         v2rayConfig.log.access = "";
                         v2rayConfig.log.error = "";
                     }
                 }
                 else
                 {
-                    if (config.logEnabled)
+                    if (config.coreBasicItem.logEnabled)
                     {
                         var dtNow = DateTime.Now;
-                        v2rayConfig.log.loglevel = config.loglevel;
+                        v2rayConfig.log.loglevel = config.coreBasicItem.loglevel;
                         v2rayConfig.log.access = Utils.GetLogPath($"Vaccess_{dtNow.ToString("yyyy-MM-dd")}.txt");
                         v2rayConfig.log.error = Utils.GetLogPath($"Verror_{dtNow.ToString("yyyy-MM-dd")}.txt");
                     }
                     else
                     {
-                        v2rayConfig.log.loglevel = config.loglevel;
+                        v2rayConfig.log.loglevel = config.coreBasicItem.loglevel;
                         v2rayConfig.log.access = "";
                         v2rayConfig.log.error = "";
                     }
@@ -187,10 +187,10 @@ namespace v2rayN.Handler
                 if (v2rayConfig.routing != null
                   && v2rayConfig.routing.rules != null)
                 {
-                    v2rayConfig.routing.domainStrategy = config.domainStrategy;
-                    v2rayConfig.routing.domainMatcher = Utils.IsNullOrEmpty(config.domainMatcher) ? null : config.domainMatcher;
+                    v2rayConfig.routing.domainStrategy = config.routingBasicItem.domainStrategy;
+                    v2rayConfig.routing.domainMatcher = Utils.IsNullOrEmpty(config.routingBasicItem.domainMatcher) ? null : config.routingBasicItem.domainMatcher;
 
-                    if (config.enableRoutingAdvanced)
+                    if (config.routingBasicItem.enableRoutingAdvanced)
                     {
                         var routing = ConfigHandler.GetDefaultRouting(ref config);
                         if (routing != null)
@@ -348,8 +348,8 @@ namespace v2rayN.Handler
                     }
 
                     //Mux
-                    outbound.mux.enabled = config.muxEnabled;
-                    outbound.mux.concurrency = config.muxEnabled ? 8 : -1;
+                    outbound.mux.enabled = config.coreBasicItem.muxEnabled;
+                    outbound.mux.concurrency = config.coreBasicItem.muxEnabled ? 8 : -1;
 
                     boundStreamSettings(node, "out", outbound.streamSettings);
 
@@ -452,8 +452,8 @@ namespace v2rayN.Handler
                     usersItem.encryption = node.security;
 
                     //Mux
-                    outbound.mux.enabled = config.muxEnabled;
-                    outbound.mux.concurrency = config.muxEnabled ? 8 : -1;
+                    outbound.mux.enabled = config.coreBasicItem.muxEnabled;
+                    outbound.mux.concurrency = config.coreBasicItem.muxEnabled ? 8 : -1;
 
                     boundStreamSettings(node, "out", outbound.streamSettings);
 
@@ -548,15 +548,15 @@ namespace v2rayN.Handler
                 string host = node.requestHost.TrimEx();
                 string sni = node.sni;
                 string useragent = "";
-                if (!config.defUserAgent.IsNullOrEmpty())
+                if (!config.coreBasicItem.defUserAgent.IsNullOrEmpty())
                 {
                     try
                     {
-                        useragent = Global.userAgentTxt[config.defUserAgent];
+                        useragent = Global.userAgentTxt[config.coreBasicItem.defUserAgent];
                     }
                     catch (KeyNotFoundException)
                     {
-                        useragent = config.defUserAgent;
+                        useragent = config.coreBasicItem.defUserAgent;
                     }
                 }
 
@@ -567,9 +567,9 @@ namespace v2rayN.Handler
 
                     TlsSettings tlsSettings = new TlsSettings
                     {
-                        allowInsecure = Utils.ToBool(node.allowInsecure.IsNullOrEmpty() ? config.defAllowInsecure.ToString().ToLower() : node.allowInsecure),
+                        allowInsecure = Utils.ToBool(node.allowInsecure.IsNullOrEmpty() ? config.coreBasicItem.defAllowInsecure.ToString().ToLower() : node.allowInsecure),
                         alpn = node.GetAlpn(),
-                        fingerprint = node.fingerprint.IsNullOrEmpty() ? config.defFingerprint : node.fingerprint
+                        fingerprint = node.fingerprint.IsNullOrEmpty() ? config.coreBasicItem.defFingerprint : node.fingerprint
                     };
                     if (!string.IsNullOrWhiteSpace(sni))
                     {
@@ -589,9 +589,9 @@ namespace v2rayN.Handler
 
                     TlsSettings xtlsSettings = new TlsSettings
                     {
-                        allowInsecure = Utils.ToBool(node.allowInsecure.IsNullOrEmpty() ? config.defAllowInsecure.ToString().ToLower() : node.allowInsecure),
+                        allowInsecure = Utils.ToBool(node.allowInsecure.IsNullOrEmpty() ? config.coreBasicItem.defAllowInsecure.ToString().ToLower() : node.allowInsecure),
                         alpn = node.GetAlpn(),
-                        fingerprint = node.fingerprint.IsNullOrEmpty() ? config.defFingerprint : node.fingerprint
+                        fingerprint = node.fingerprint.IsNullOrEmpty() ? config.coreBasicItem.defFingerprint : node.fingerprint
                     };
                     if (!string.IsNullOrWhiteSpace(sni))
                     {
@@ -825,7 +825,7 @@ namespace v2rayN.Handler
 
         private static int statistic(Config config, ref V2rayConfig v2rayConfig)
         {
-            if (config.enableStatistics)
+            if (config.guiItem.enableStatistics)
             {
                 string tag = Global.InboundAPITagName;
                 API apiObj = new API();
