@@ -3,17 +3,18 @@ using System.IO;
 using System.Reactive.Linq;
 using v2rayN.Handler;
 using v2rayN.Mode;
+using v2rayN.Resx;
 
 namespace v2rayN.Base
 {
     public sealed class TunHandler
     {
-        private static readonly Lazy<TunHandler> _instance = new Lazy<TunHandler>(() => new());
+        private static readonly Lazy<TunHandler> _instance = new(() => new());
         public static TunHandler Instance => _instance.Value;
         private string _tunConfigName = "tunConfig.json";
         private static Config _config;
         private CoreInfo coreInfo;
-        private Process _process;
+        private Process? _process;
         private static int _socksPort;
         private static bool _needRestart = true;
         private static bool _isRunning = false;
@@ -44,7 +45,7 @@ namespace v2rayN.Base
         {
             var socksPort = LazyConfig.Instance.GetLocalPort(Global.InboundSocks);
 
-            if (socksPort.Equals(_socksPort)
+            if (socksPort == _socksPort
                 && _process != null
                 && !_process.HasExited)
             {
@@ -60,6 +61,7 @@ namespace v2rayN.Base
                 {
                     return;
                 }
+                CoreStartTest();
                 CoreStart();
             }
         }
@@ -101,6 +103,7 @@ namespace v2rayN.Base
             configStr = configStr.Replace("$stack$", $"{_config.tunModeItem.stack}");
 
             //logs
+            configStr = configStr.Replace("$log_disabled$", $"{(!_config.tunModeItem.enabledLog).ToString().ToLower()}");
             if (_config.tunModeItem.showWindow)
             {
                 configStr = configStr.Replace("$log_output$", $"");
@@ -108,7 +111,7 @@ namespace v2rayN.Base
             else
             {
                 var dtNow = DateTime.Now;
-                var log_output = $"\"output\": \"{Utils.GetLogPath($"singbox_{dtNow.ToString("yyyy-MM-dd")}.txt")}\", ";
+                var log_output = $"\"output\": \"{Utils.GetLogPath($"singbox_{dtNow:yyyy-MM-dd}.txt")}\", ";
                 configStr = configStr.Replace("$log_output$", $"{log_output.Replace(@"\", @"\\")}");
             }
 
@@ -116,8 +119,8 @@ namespace v2rayN.Base
             configStr = configStr.Replace("$socksPort$", $"{_socksPort}");
 
             //exe
-            List<string> lstDnsExe = new List<string>();
-            List<string> lstDirectExe = new List<string>();
+            List<string> lstDnsExe = new();
+            List<string> lstDirectExe = new();
             var coreInfos = LazyConfig.Instance.GetCoreInfos();
             foreach (var it in coreInfos)
             {
@@ -225,7 +228,8 @@ namespace v2rayN.Base
             }
             if (Utils.IsNullOrEmpty(fileName))
             {
-
+                string msg = string.Format(ResUI.NotFoundCore, Utils.GetBinPath("", coreInfo.coreType), string.Join(", ", coreInfo.coreExes.ToArray()), coreInfo.coreUrl);
+                Utils.SaveLog(msg);
             }
             return fileName;
         }
@@ -235,12 +239,12 @@ namespace v2rayN.Base
             try
             {
                 string fileName = CoreFindexe();
-                if (fileName == "")
+                if (Utils.IsNullOrEmpty(fileName))
                 {
                     return;
                 }
                 var showWindow = _config.tunModeItem.showWindow;
-                Process p = new Process
+                Process p = new()
                 {
                     StartInfo = new ProcessStartInfo
                     {
@@ -291,6 +295,48 @@ namespace v2rayN.Base
             catch (Exception ex)
             {
                 Utils.SaveLog(ex.Message, ex);
+            }
+        }
+
+        private int CoreStartTest()
+        {
+            Utils.SaveLog("Tun mode configuration file test start");
+            try
+            {
+                string fileName = CoreFindexe();
+                if (fileName == "")
+                {
+                    return -1;
+                }
+                Process p = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = fileName,
+                        Arguments = $"run -c \"{Utils.GetConfigPath(_tunConfigName)}\"",
+                        WorkingDirectory = Utils.GetConfigPath(),
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardError = true,
+                        Verb = "runas",
+                    }
+                };
+                p.Start();
+                if (p.WaitForExit(2000))
+                {
+                    throw new Exception(p.StandardError.ReadToEnd());
+                }
+                KillProcess(p);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.SaveLog(ex.Message, ex);
+                return -1;
+            }
+            finally
+            {
+                Utils.SaveLog("Tun mode configuration file test end");
             }
         }
     }
