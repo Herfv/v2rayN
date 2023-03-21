@@ -282,6 +282,8 @@ namespace v2rayN
                   .Replace(Environment.NewLine, "")
                   .Replace("\n", "")
                   .Replace("\r", "")
+                  .Replace('_', '/')
+                  .Replace('-', '+')
                   .Replace(" ", "");
 
                 if (plainText.Length % 4 > 0)
@@ -312,7 +314,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                //SaveLog(ex.Message, ex);
                 return 0;
             }
         }
@@ -324,7 +326,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                //SaveLog(ex.Message, ex);
                 return false;
             }
         }
@@ -337,7 +339,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                //SaveLog(ex.Message, ex);
                 return string.Empty;
             }
         }
@@ -778,7 +780,7 @@ namespace v2rayN
             task.Settings.RunOnlyIfIdle = false;
             task.Settings.IdleSettings.StopOnIdleEnd = false;
             task.Settings.ExecutionTimeLimit = TimeSpan.Zero;
-            task.Triggers.Add(new LogonTrigger { UserId = logonUser, Delay = TimeSpan.FromMinutes(1) });
+            task.Triggers.Add(new LogonTrigger { UserId = logonUser, Delay = TimeSpan.FromSeconds(10) });
             task.Principal.RunLevel = TaskRunLevel.Highest;
             task.Actions.Add(new ExecAction(deamonFileName));
 
@@ -865,7 +867,7 @@ namespace v2rayN
                 string location = GetExePath();
                 if (blFull)
                 {
-                    return string.Format("v2rayN - V{0} - {1}",
+                    return string.Format("v2rayN - V{0} - {1}-Test",
                             FileVersionInfo.GetVersionInfo(location).FileVersion.ToString(),
                             File.GetLastWriteTime(location).ToString("yyyy/MM/dd"));
                 }
@@ -907,13 +909,13 @@ namespace v2rayN
         /// <returns></returns>
         public static string? GetClipboardData()
         {
-            string strData = string.Empty;
+            string? strData = string.Empty;
             try
             {
                 IDataObject data = Clipboard.GetDataObject();
                 if (data.GetDataPresent(DataFormats.UnicodeText))
                 {
-                    strData = data.GetData(DataFormats.UnicodeText).ToString();
+                    strData = data.GetData(DataFormats.UnicodeText)?.ToString();
                 }
                 return strData;
             }
@@ -1150,17 +1152,23 @@ namespace v2rayN
 
         public static void SaveLog(string strContent)
         {
-            var logger = LogManager.GetLogger("Log1");
-            logger.Info(strContent);
+            if (LogManager.IsLoggingEnabled())
+            {
+                var logger = LogManager.GetLogger("Log1");
+                logger.Info(strContent);
+            }
         }
         public static void SaveLog(string strTitle, Exception ex)
         {
-            var logger = LogManager.GetLogger("Log2");
-            logger.Debug($"{strTitle},{ex.Message}");
-            logger.Debug(ex.StackTrace);
-            if (ex?.InnerException != null)
+            if (LogManager.IsLoggingEnabled())
             {
-                logger.Error(ex.InnerException);
+                var logger = LogManager.GetLogger("Log2");
+                logger.Debug($"{strTitle},{ex.Message}");
+                logger.Debug(ex.StackTrace);
+                if (ex?.InnerException != null)
+                {
+                    logger.Error(ex.InnerException);
+                }
             }
         }
 
