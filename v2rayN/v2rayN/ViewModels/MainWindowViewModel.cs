@@ -3,6 +3,7 @@ using DynamicData.Binding;
 using MaterialDesignColors;
 using MaterialDesignColors.ColorManipulation;
 using MaterialDesignThemes.Wpf;
+using Microsoft.Win32;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -12,7 +13,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Media;
 using v2rayN.Base;
 using v2rayN.Handler;
@@ -563,8 +563,8 @@ namespace v2rayN.ViewModels
                     {
                         return;
                     }
-                    SpeedProxyDisplay = string.Format("{0}:{1}/s¡ü | {2}/s¡ý", Global.agentTag, Utils.HumanFy(update.proxyUp), Utils.HumanFy(update.proxyDown));
-                    SpeedDirectDisplay = string.Format("{0}:{1}/s¡ü | {2}/s¡ý", Global.directTag, Utils.HumanFy(update.directUp), Utils.HumanFy(update.directDown));
+                    SpeedProxyDisplay = string.Format("{0}:{1}/sï¿½ï¿½ | {2}/sï¿½ï¿½", Global.agentTag, Utils.HumanFy(update.proxyUp), Utils.HumanFy(update.proxyDown));
+                    SpeedDirectDisplay = string.Format("{0}:{1}/sï¿½ï¿½ | {2}/sï¿½ï¿½", Global.directTag, Utils.HumanFy(update.directUp), Utils.HumanFy(update.directDown));
 
                     if (update.proxyUp + update.proxyDown > 0)
                     {
@@ -953,7 +953,7 @@ namespace v2rayN.ViewModels
                 return;
             }
 
-            if (UI.ShowYesNo(ResUI.RemoveServer) == DialogResult.No)
+            if (UI.ShowYesNo(ResUI.RemoveServer) == MessageBoxResult.No)
             {
                 return;
             }
@@ -1068,10 +1068,7 @@ namespace v2rayN.ViewModels
                 return;
             }
 
-            if (!_dicHeaderSort.ContainsKey(colName))
-            {
-                _dicHeaderSort.Add(colName, true);
-            }
+            _dicHeaderSort.TryAdd(colName, true);
             _dicHeaderSort.TryGetValue(colName, out bool asc);
             if (ConfigHandler.SortServers(ref _config, _subId, colName, asc) != 0)
             {
@@ -1110,7 +1107,7 @@ namespace v2rayN.ViewModels
                 return;
             }
 
-            if (GetProfileItems(out List<ProfileItem> lstSelecteds, false) < 0)
+            if (GetProfileItems(out List<ProfileItem> lstSelecteds, true) < 0)
             {
                 return;
             }
@@ -1302,7 +1299,7 @@ namespace v2rayN.ViewModels
                 Multiselect = false,
                 Filter = "guiNConfig|*.json|All|*.*"
             };
-            if (fileDialog.ShowDialog() != DialogResult.OK)
+            if (fileDialog.ShowDialog() != true)
             {
                 return;
             }
