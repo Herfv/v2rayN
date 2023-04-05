@@ -15,7 +15,6 @@ using v2rayN.Mode;
 using v2rayN.Resx;
 using v2rayN.ViewModels;
 using Point = System.Windows.Point;
-using SystemInformation = System.Windows.Forms.SystemInformation;
 
 namespace v2rayN.Views
 {
@@ -31,9 +30,11 @@ namespace v2rayN.Views
             App.Current.SessionEnding += Current_SessionEnding;
             this.Closing += MainWindow_Closing;
             this.PreviewKeyDown += MainWindow_PreviewKeyDown;
+            btnAutofitColumnWidth.Click += BtnAutofitColumnWidth_Click;
             lstProfiles.PreviewKeyDown += LstProfiles_PreviewKeyDown;
             lstProfiles.SelectionChanged += lstProfiles_SelectionChanged;
             lstProfiles.LoadingRow += LstProfiles_LoadingRow;
+            lstProfiles.RowHeaderWidth = 30;
             if (_config.uiItem.enableDragDropSort)
             {
                 lstProfiles.AllowDrop = true;
@@ -193,10 +194,10 @@ namespace v2rayN.Views
 
             spEnableTun.Visibility = IsAdministrator ? Visibility.Visible : Visibility.Collapsed;
 
-            if (_config.uiItem.autoHideStartup)
-            {
-                WindowState = WindowState.Minimized;
-            }
+            //if (_config.uiItem.autoHideStartup)
+            //{
+            //    WindowState = WindowState.Minimized;
+            //}
 
             if (!_config.guiItem.enableHWA)
             {
@@ -206,19 +207,16 @@ namespace v2rayN.Views
 
         #region Event 
 
-        private void UpdateViewHandler(string action)
+        private void UpdateViewHandler(EViewAction action)
         {
-            if (action == "AdjustMainLvColWidth")
+            if (action == EViewAction.AdjustMainLvColWidth)
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    foreach (var it in lstProfiles.Columns)
-                    {
-                        it.Width = new DataGridLength(1, DataGridLengthUnitType.Auto);
-                    }
+                    AutofitColumnWidth();
                 });
             }
-            else if (action == "ProfilesFocus")
+            else if (action == EViewAction.ProfilesFocus)
             {
                 lstProfiles.Focus();
             }
@@ -275,16 +273,6 @@ namespace v2rayN.Views
             var colHeader = sender as DataGridColumnHeader;
             if (colHeader == null || colHeader.TabIndex < 0 || colHeader.Column == null)
             {
-                return;
-            }
-
-            if (colHeader.Column.GetType().Name != typeof(MyDGTextColumn).Name)
-            {
-                foreach (var it in lstProfiles.Columns)
-                {
-                    //it.MinWidth = it.ActualWidth;
-                    it.Width = new DataGridLength(1, DataGridLengthUnitType.Auto);
-                }
                 return;
             }
 
@@ -408,6 +396,18 @@ namespace v2rayN.Views
         {
             Utils.ProcessStart(Utils.GetBinPath("EnableLoopback.exe"));
         }
+
+        private void BtnAutofitColumnWidth_Click(object sender, RoutedEventArgs e)
+        {
+            AutofitColumnWidth();
+        }
+        private void AutofitColumnWidth()
+        {
+            foreach (var it in lstProfiles.Columns)
+            {
+                it.Width = new DataGridLength(1, DataGridLengthUnitType.Auto);
+            }
+        }
         #endregion
 
         #region UI          
@@ -420,16 +420,13 @@ namespace v2rayN.Views
                 Height = _config.uiItem.mainHeight;
             }
 
-            IntPtr hWnd = new WindowInteropHelper(this).EnsureHandle();
-            Graphics g = Graphics.FromHwnd(hWnd);
-            if (Width > SystemInformation.WorkingArea.Width * 96 / g.DpiX)
-            {
-                Width = SystemInformation.WorkingArea.Width * 96 / g.DpiX;
-            }
-            if (Height > SystemInformation.WorkingArea.Height * 96 / g.DpiY)
-            {
-                Height = SystemInformation.WorkingArea.Height * 96 / g.DpiY;
-            }
+            //IntPtr hWnd = new WindowInteropHelper(this).EnsureHandle();
+            //Graphics g = Graphics.FromHwnd(hWnd);
+            //var dip = 96;
+            var maxWidth = SystemParameters.WorkArea.Width;// * dip / g.DpiX;
+            var maxHeight = SystemParameters.WorkArea.Height;// * dip / g.DpiY;
+            if (Width > maxWidth) Width = maxWidth;
+            if (Height > maxHeight) Height = maxHeight;
             if (_config.uiItem.mainGirdHeight1 > 0 && _config.uiItem.mainGirdHeight2 > 0)
             {
                 gridMain.RowDefinitions[0].Height = new GridLength(_config.uiItem.mainGirdHeight1, GridUnitType.Star);
@@ -452,7 +449,7 @@ namespace v2rayN.Views
                         else
                         {
                             item2.Width = item.Width;
-                            item2.DisplayIndex = i + 1;
+                            item2.DisplayIndex = i;
                         }
                     }
                 }
