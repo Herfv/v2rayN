@@ -7,6 +7,7 @@ using Microsoft.Win32;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reactive;
@@ -20,7 +21,6 @@ using v2rayN.Mode;
 using v2rayN.Resx;
 using v2rayN.Tool;
 using v2rayN.Views;
-using Application = System.Windows.Application;
 
 
 namespace v2rayN.ViewModels
@@ -122,6 +122,7 @@ namespace v2rayN.ViewModels
         public ReactiveCommand<Unit, Unit> OptionSettingCmd { get; }
         public ReactiveCommand<Unit, Unit> RoutingSettingCmd { get; }
         public ReactiveCommand<Unit, Unit> GlobalHotkeySettingCmd { get; }
+        public ReactiveCommand<Unit, Unit> RebootAsAdminCmd { get; }        
         public ReactiveCommand<Unit, Unit> ClearServerStatisticsCmd { get; }
         public ReactiveCommand<Unit, Unit> ImportOldGuiConfigCmd { get; }
 
@@ -431,6 +432,10 @@ namespace v2rayN.ViewModels
                 {
                     _noticeHandler?.Enqueue(ResUI.OperationSuccess);
                 }
+            });
+            RebootAsAdminCmd = ReactiveCommand.Create(() =>
+            {
+                RebootAsAdmin();
             });
             ClearServerStatisticsCmd = ReactiveCommand.Create(() =>
             {
@@ -924,9 +929,10 @@ namespace v2rayN.ViewModels
         {
             ShowHideWindow(false);
 
+            var dpiXY = Utils.GetDpiXY(Application.Current.MainWindow);
             string result = await Task.Run(() =>
             {
-                return Utils.ScanScreen();
+                return Utils.ScanScreen(dpiXY.Item1, dpiXY.Item2);
             });
 
             ShowHideWindow(true);
@@ -1290,6 +1296,24 @@ namespace v2rayN.ViewModels
                 //RefreshServers();
                 Reload();
             }
+        }
+
+        private void RebootAsAdmin()
+        {
+            ProcessStartInfo startInfo = new()
+            {
+                UseShellExecute = true,
+                Arguments = Global.RebootAs,
+                WorkingDirectory = Utils.StartupPath(),
+                FileName = Utils.GetExePath(),
+                Verb = "runas",
+            };
+            try
+            {
+                Process.Start(startInfo);
+                MyAppExit(false);
+            }
+            catch { }
         }
 
         private void ImportOldGuiConfig()
