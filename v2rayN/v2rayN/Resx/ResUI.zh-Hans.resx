@@ -195,9 +195,6 @@
   <data name="LvAddress" xml:space="preserve">
     <value>地址</value>
   </data>
-  <data name="LvAlias" xml:space="preserve">
-    <value>别名</value>
-  </data>
   <data name="LvEncryptionMethod" xml:space="preserve">
     <value>加密方式</value>
   </data>
@@ -209,9 +206,6 @@
   </data>
   <data name="LvSubscription" xml:space="preserve">
     <value>订阅分组</value>
-  </data>
-  <data name="LvTestResults" xml:space="preserve">
-    <value>测试结果</value>
   </data>
   <data name="LvTodayDownloadDataAmount" xml:space="preserve">
     <value>今日下载</value>
@@ -228,9 +222,6 @@
   <data name="LvTransportProtocol" xml:space="preserve">
     <value>传输协议</value>
   </data>
-  <data name="MediumFresh" xml:space="preserve">
-    <value>中等</value>
-  </data>
   <data name="MsgClearSubscription" xml:space="preserve">
     <value>清除原订阅内容</value>
   </data>
@@ -246,26 +237,14 @@
   <data name="MsgNoValidSubscription" xml:space="preserve">
     <value>未设置有效的订阅</value>
   </data>
-  <data name="MsgPACUpdateFailed" xml:space="preserve">
-    <value>PAC更新失败</value>
-  </data>
-  <data name="MsgPACUpdateSuccessfully" xml:space="preserve">
-    <value>PAC更新成功</value>
-  </data>
   <data name="MsgParsingSuccessfully" xml:space="preserve">
     <value>解析{0}成功</value>
-  </data>
-  <data name="MsgSimplifyPAC" xml:space="preserve">
-    <value>简化PAC成功</value>
   </data>
   <data name="MsgStartGettingSubscriptions" xml:space="preserve">
     <value>开始获取订阅内容</value>
   </data>
   <data name="MsgStartUpdating" xml:space="preserve">
     <value>开始更新 {0}...</value>
-  </data>
-  <data name="MsgStartUpdatingPAC" xml:space="preserve">
-    <value>开始更新 PAC...</value>
   </data>
   <data name="MsgSubscriptionDecodingFailed" xml:space="preserve">
     <value>无效的订阅内容</value>
@@ -284,9 +263,6 @@
   </data>
   <data name="MsgUpdateV2rayCoreSuccessfullyMore" xml:space="preserve">
     <value>更新Core成功！正在重启服务...</value>
-  </data>
-  <data name="NeedHttpGlobalProxy" xml:space="preserve">
-    <value>此功能依赖Http全局代理,请先设置正确。</value>
   </data>
   <data name="NonvmessOrssProtocol" xml:space="preserve">
     <value>非VMess或ss协议</value>
@@ -315,9 +291,6 @@
   <data name="PleaseSelectServer" xml:space="preserve">
     <value>请先选择服务器</value>
   </data>
-  <data name="QuickFresh" xml:space="preserve">
-    <value>快</value>
-  </data>
   <data name="RemoveDuplicateServerResult" xml:space="preserve">
     <value>服务器去重完成。原数量: {0}，现数量: {1}</value>
   </data>
@@ -329,15 +302,6 @@
   </data>
   <data name="SaveServerConfigurationIn" xml:space="preserve">
     <value>服务端配置文件保存在:{0}</value>
-  </data>
-  <data name="SlowFresh" xml:space="preserve">
-    <value>慢</value>
-  </data>
-  <data name="SpeedServerTips" xml:space="preserve">
-    <value>注意：此功能依赖Http全局代理!测试完成后,请手工调整Http全局代理和活动节点。</value>
-  </data>
-  <data name="StartPacFailed" xml:space="preserve">
-    <value>PAC服务启动失败,请用管理员启动</value>
   </data>
   <data name="StartService" xml:space="preserve">
     <value>启动服务({0})...</value>
@@ -410,13 +374,13 @@
     <value>*grpc serviceName</value>
   </data>
   <data name="TransportRequestHostTip1" xml:space="preserve">
-    <value>*http host中间逗号(,)隔开</value>
+    <value>*http host中间逗号(,)分隔</value>
   </data>
   <data name="TransportRequestHostTip2" xml:space="preserve">
     <value>*ws host</value>
   </data>
   <data name="TransportRequestHostTip3" xml:space="preserve">
-    <value>*h2 host中间逗号(,)隔开</value>
+    <value>*h2 host中间逗号(,)分隔</value>
   </data>
   <data name="TransportRequestHostTip4" xml:space="preserve">
     <value>*QUIC 加密方式</value>
@@ -471,9 +435,6 @@
   </data>
   <data name="MsgServerTitle" xml:space="preserve">
     <value>服务器过滤器</value>
-  </data>
-  <data name="NetFrameworkRequirementsTip" xml:space="preserve">
-    <value>正常使用此版本需要.NET Framework 4.8，请更新后重启</value>
   </data>
   <data name="menuCheckUpdate" xml:space="preserve">
     <value>检查更新</value>
@@ -763,9 +724,6 @@
   <data name="TbSettingsAutoHideStartup" xml:space="preserve">
     <value>启动后隐藏窗口</value>
   </data>
-  <data name="TbSettingsAutoTest" xml:space="preserve">
-    <value>自动延迟测试的间隔 (单位分钟)</value>
-  </data>
   <data name="TbSettingsAutoUpdate" xml:space="preserve">
     <value>自动更新订阅的间隔(单位小时)</value>
   </data>
@@ -808,9 +766,6 @@
   <data name="TbSettingsIgnoreGeoUpdateCore" xml:space="preserve">
     <value>更新Core时忽略Geo文件</value>
   </data>
-  <data name="TbSettingsIpv6" xml:space="preserve">
-    <value>启用IPv6</value>
-  </data>
   <data name="TbSettingsKeepOlderDedupl" xml:space="preserve">
     <value>去重时保留序号较小的项</value>
   </data>
@@ -826,17 +781,11 @@
   <data name="TbSettingsN" xml:space="preserve">
     <value>v2rayN 设置</value>
   </data>
-  <data name="TbSettingsPacListenPort" xml:space="preserve">
-    <value>Pac监听端口号</value>
-  </data>
   <data name="TbSettingsPass" xml:space="preserve">
     <value>认证密码</value>
   </data>
   <data name="TbSettingsRemoteDNS" xml:space="preserve">
-    <value>自定义DNS(可多个,用逗号(,)隔开)</value>
-  </data>
-  <data name="TbSettingsSaveTip" xml:space="preserve">
-    <value>修改以下参数后，点击保存才生效</value>
+    <value>自定义DNS(可多个,用逗号(,)分隔)</value>
   </data>
   <data name="TbSettingsSetUWP" xml:space="preserve">
     <value>解除Win10 UWP应用回环代理限制</value>
@@ -1155,5 +1104,8 @@
   </data>
   <data name="menuRebootAsAdmin" xml:space="preserve">
     <value>以管理员身份重启</value>
+  </data>
+  <data name="LvMoreUrl" xml:space="preserve">
+    <value>更多地址(url)，用逗号(,)分隔</value>
   </data>
 </root>
