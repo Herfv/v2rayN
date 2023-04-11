@@ -797,7 +797,7 @@ namespace v2rayN.Handler
 
             if (!Global.flows.Contains(profileItem.flow))
             {
-                return -1;
+                profileItem.flow = Global.flows.First();
             }
 
             AddServerCommon(ref config, profileItem, toFile);
@@ -871,8 +871,7 @@ namespace v2rayN.Handler
                 return false;
             }
 
-            return o.configVersion == n.configVersion
-                && o.configType == n.configType
+            return o.configType == n.configType
                 && o.address == n.address
                 && o.port == n.port
                 && o.id == n.id
@@ -941,7 +940,11 @@ namespace v2rayN.Handler
             //Check for duplicate indexId
             List<string>? lstDbIndexId = null;
             List<ProfileItem> lstAdd = new();
-            string[] arrData = clipboardData.Split(Environment.NewLine.ToCharArray());
+            var arrData = clipboardData.Split(Environment.NewLine.ToCharArray()).Where(t => !t.IsNullOrEmpty());
+            if (isSub)
+            {
+                arrData = arrData.Distinct();
+            }
             foreach (string str in arrData)
             {
                 //maybe sub
