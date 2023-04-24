@@ -121,7 +121,6 @@ namespace v2rayN.ViewModels
         //servers export
         public ReactiveCommand<Unit, Unit> Export2ClientConfigCmd { get; }
 
-        public ReactiveCommand<Unit, Unit> Export2ServerConfigCmd { get; }
         public ReactiveCommand<Unit, Unit> Export2ShareUrlCmd { get; }
         public ReactiveCommand<Unit, Unit> Export2SubContentCmd { get; }
 
@@ -138,6 +137,7 @@ namespace v2rayN.ViewModels
         public ReactiveCommand<Unit, Unit> OptionSettingCmd { get; }
 
         public ReactiveCommand<Unit, Unit> RoutingSettingCmd { get; }
+        public ReactiveCommand<Unit, Unit> DNSSettingCmd { get; }
         public ReactiveCommand<Unit, Unit> GlobalHotkeySettingCmd { get; }
         public ReactiveCommand<Unit, Unit> RebootAsAdminCmd { get; }
         public ReactiveCommand<Unit, Unit> ClearServerStatisticsCmd { get; }
@@ -419,10 +419,6 @@ namespace v2rayN.ViewModels
             {
                 Export2ClientConfig();
             }, canEditRemove);
-            Export2ServerConfigCmd = ReactiveCommand.Create(() =>
-            {
-                Export2ServerConfig();
-            }, canEditRemove);
             Export2ShareUrlCmd = ReactiveCommand.Create(() =>
             {
                 Export2ShareUrl();
@@ -466,6 +462,10 @@ namespace v2rayN.ViewModels
             RoutingSettingCmd = ReactiveCommand.Create(() =>
             {
                 RoutingSetting();
+            });
+            DNSSettingCmd = ReactiveCommand.Create(() =>
+            {
+                DNSSetting();
             });
             GlobalHotkeySettingCmd = ReactiveCommand.Create(() =>
             {
@@ -556,7 +556,7 @@ namespace v2rayN.ViewModels
         private void Init()
         {
             ConfigHandler.InitBuiltinRouting(ref _config);
-            //MainFormHandler.Instance.BackupGuiNConfig(_config, true);
+            ConfigHandler.InitBuiltinDNS(_config);
             _coreHandler = new CoreHandler(UpdateHandler);
 
             if (_config.guiItem.enableStatistics)
@@ -1247,17 +1247,6 @@ namespace v2rayN.ViewModels
             MainFormHandler.Instance.Export2ClientConfig(item, _config);
         }
 
-        private void Export2ServerConfig()
-        {
-            var item = LazyConfig.Instance.GetProfileItem(SelectedProfile.indexId);
-            if (item is null)
-            {
-                _noticeHandler?.Enqueue(ResUI.PleaseSelectServer);
-                return;
-            }
-            MainFormHandler.Instance.Export2ServerConfig(item, _config);
-        }
-
         public void Export2ShareUrl()
         {
             if (GetProfileItems(out List<ProfileItem> lstSelecteds, true) < 0)
@@ -1360,6 +1349,14 @@ namespace v2rayN.ViewModels
                 ConfigHandler.InitBuiltinRouting(ref _config);
                 RefreshRoutingsMenu();
                 //RefreshServers();
+                Reload();
+            }
+        }
+        private void DNSSetting()
+        {
+            var ret = (new DNSSettingWindow()).ShowDialog();
+            if (ret == true)
+            {
                 Reload();
             }
         }
