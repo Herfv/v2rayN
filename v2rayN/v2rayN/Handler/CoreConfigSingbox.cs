@@ -77,6 +77,10 @@ namespace v2rayN.Handler
                         singboxConfig.log.level = _config.coreBasicItem.loglevel;
                         break;
 
+                    case "warn":
+                        singboxConfig.log.level = "warning";
+                        break;
+
                     default:
                         break;
                 }
@@ -97,31 +101,67 @@ namespace v2rayN.Handler
             return 0;
         }
 
+        #region inbound private
+
         private int inbound(SingboxConfig singboxConfig)
         {
             try
             {
-                var inbound = singboxConfig.inbounds[0];
-                inbound.listen_port = LazyConfig.Instance.GetLocalPort(Global.InboundSocks);
-                inbound.sniff = _config.inbound[0].sniffingEnabled;
-                inbound.sniff_override_destination = _config.inbound[0].sniffingEnabled;
-
-                //http
-                var inbound2 = Utils.DeepCopy(inbound);
-                inbound2.listen_port = LazyConfig.Instance.GetLocalPort(Global.InboundHttp);
-                inbound2.type = Global.InboundHttp;
-                inbound2.tag = Global.InboundHttp;
-                singboxConfig.inbounds.Add(inbound2);
-
-                if (_config.inbound[0].allowLANConn)
+                if (_config.tunModeItem.enableTun)
                 {
-                    if (_config.inbound[0].newPort4LAN)
+                    singboxConfig.inbounds.Clear();
+
+                    if (_config.tunModeItem.mtu <= 0)
                     {
+                        _config.tunModeItem.mtu = Convert.ToInt32(Global.TunMtus[0]);
                     }
-                    else
+                    if (Utils.IsNullOrEmpty(_config.tunModeItem.stack))
                     {
-                        inbound.listen = "::";
-                        inbound2.listen = "::";
+                        _config.tunModeItem.stack = Global.TunStacks[0];
+                    }
+
+                    var tunInbound = Utils.FromJson<Inbound4Sbox>(Utils.GetEmbedText(Global.TunSingboxInboundFileName));
+                    tunInbound.mtu = _config.tunModeItem.mtu;
+                    tunInbound.strict_route = _config.tunModeItem.strictRoute;
+                    tunInbound.stack = _config.tunModeItem.stack;
+
+                    singboxConfig.inbounds.Add(tunInbound);
+                }
+                else
+                {
+                    var inbound = singboxConfig.inbounds[0];
+                    inbound.listen_port = LazyConfig.Instance.GetLocalPort(Global.InboundSocks);
+                    inbound.sniff = _config.inbound[0].sniffingEnabled;
+                    inbound.sniff_override_destination = _config.inbound[0].routeOnly ? false : _config.inbound[0].sniffingEnabled;
+
+                    //http
+                    var inbound2 = GetInbound(inbound, Global.InboundHttp, 1, false);
+                    singboxConfig.inbounds.Add(inbound2);
+
+                    if (_config.inbound[0].allowLANConn)
+                    {
+                        if (_config.inbound[0].newPort4LAN)
+                        {
+                            var inbound3 = GetInbound(inbound, Global.InboundSocks2, 2, true);
+                            inbound3.listen = "::";
+                            singboxConfig.inbounds.Add(inbound3);
+
+                            var inbound4 = GetInbound(inbound, Global.InboundHttp2, 3, false);
+                            inbound4.listen = "::";
+                            singboxConfig.inbounds.Add(inbound4);
+
+                            //auth
+                            if (!Utils.IsNullOrEmpty(_config.inbound[0].user) && !Utils.IsNullOrEmpty(_config.inbound[0].pass))
+                            {
+                                inbound3.users = new() { new() { username = _config.inbound[0].user, password = _config.inbound[0].pass } };
+                                inbound4.users = new() { new() { username = _config.inbound[0].user, password = _config.inbound[0].pass } };
+                            }
+                        }
+                        else
+                        {
+                            inbound.listen = "::";
+                            inbound2.listen = "::";
+                        }
                     }
                 }
             }
@@ -132,12 +172,32 @@ namespace v2rayN.Handler
             return 0;
         }
 
+        private Inbound4Sbox? GetInbound(Inbound4Sbox inItem, string tag, int offset, bool bSocks)
+        {
+            var inbound = Utils.DeepCopy(inItem);
+            inbound.tag = tag;
+            inbound.listen_port = inItem.listen_port + offset;
+            inbound.type = bSocks ? Global.InboundSocks : Global.InboundHttp;
+            return inbound;
+        }
+
+        #endregion inbound private
+
         #region outbound private
 
         private int outbound(ProfileItem node, SingboxConfig singboxConfig)
         {
             try
             {
+                if (_config.tunModeItem.enableTun)
+                {
+                    singboxConfig.outbounds.Add(new()
+                    {
+                        type = "dns",
+                        tag = "dns_out"
+                    });
+                }
+
                 var outbound = singboxConfig.outbounds[0];
                 outbound.server = node.address;
                 outbound.server_port = node.port;
@@ -326,6 +386,28 @@ namespace v2rayN.Handler
         {
             try
             {
+                if (_config.tunModeItem.enableTun)
+                {
+                    singboxConfig.route.auto_detect_interface = true;
+
+                    var tunRules = Utils.FromJson<List<Rule4Sbox>>(Utils.GetEmbedText(Global.TunSingboxRulesFileName));
+                    singboxConfig.route.rules.AddRange(tunRules);
+
+                    routingDirectExe(out List<string> lstDnsExe, out List<string> lstDirectExe);
+                    singboxConfig.route.rules.Add(new()
+                    {
+                        port = new() { 53 },
+                        outbound = "dns_out",
+                        process_name = lstDnsExe
+                    });
+
+                    singboxConfig.route.rules.Add(new()
+                    {
+                        outbound = "direct",
+                        process_name = lstDirectExe
+                    });
+                }
+
                 if (_config.routingBasicItem.enableRoutingAdvanced)
                 {
                     var routing = ConfigHandler.GetDefaultRouting(ref _config);
@@ -353,12 +435,70 @@ namespace v2rayN.Handler
                         }
                     }
                 }
+
+                if (_config.tunModeItem.enableTun)
+                {
+                    if (_config.tunModeItem.bypassMode)
+                    {
+                        //direct ips
+                        if (_config.tunModeItem.directIP != null && _config.tunModeItem.directIP.Count > 0)
+                        {
+                            singboxConfig.route.rules.Add(new() { outbound = "direct", ip_cidr = _config.tunModeItem.directIP });
+                        }
+                        //direct process
+                        if (_config.tunModeItem.directProcess != null && _config.tunModeItem.directProcess.Count > 0)
+                        {
+                            singboxConfig.route.rules.Add(new() { outbound = "direct", process_name = _config.tunModeItem.directProcess });
+                        }
+                    }
+                    else
+                    {
+                        //proxy ips
+                        if (_config.tunModeItem.proxyIP != null && _config.tunModeItem.proxyIP.Count > 0)
+                        {
+                            singboxConfig.route.rules.Add(new() { outbound = "proxy", ip_cidr = _config.tunModeItem.proxyIP });
+                        }
+                        //proxy process
+                        if (_config.tunModeItem.proxyProcess != null && _config.tunModeItem.proxyProcess.Count > 0)
+                        {
+                            singboxConfig.route.rules.Add(new() { outbound = "proxy", process_name = _config.tunModeItem.proxyProcess });
+                        }
+
+                        singboxConfig.route.rules.Add(new() { outbound = "direct", inbound = new() { "tun-in" } });
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Utils.SaveLog(ex.Message, ex);
             }
             return 0;
+        }
+
+        private void routingDirectExe(out List<string> lstDnsExe, out List<string> lstDirectExe)
+        {
+            lstDnsExe = new();
+            lstDirectExe = new();
+            var coreInfos = LazyConfig.Instance.GetCoreInfos();
+            foreach (var it in coreInfos)
+            {
+                if (it.coreType == ECoreType.v2rayN)
+                {
+                    continue;
+                }
+                foreach (var it2 in it.coreExes)
+                {
+                    if (!lstDnsExe.Contains(it2) && it.coreType != ECoreType.sing_box)
+                    {
+                        lstDnsExe.Add($"{it2}.exe");
+                    }
+
+                    if (!lstDirectExe.Contains(it2))
+                    {
+                        lstDirectExe.Add($"{it2}.exe");
+                    }
+                }
+            }
         }
 
         private int routingUserRule(RulesItem item, List<Rule4Sbox> rules)
@@ -497,17 +637,26 @@ namespace v2rayN.Handler
         {
             try
             {
-                var item = LazyConfig.Instance.GetDNSItem(ECoreType.sing_box);
-                var normalDNS = item?.normalDNS;
-                if (string.IsNullOrWhiteSpace(normalDNS))
+                if (_config.tunModeItem.enableTun)
                 {
-                    return 0;
-                }
-
-                var obj = Utils.ParseJson(normalDNS);
-                if (obj?.ContainsKey("servers") == true)
-                {
+                    var tunDNS = Utils.GetEmbedText(Global.TunSingboxDNSFileName);
+                    var obj = Utils.ParseJson(tunDNS);
                     singboxConfig.dns = obj;
+                }
+                else
+                {
+                    var item = LazyConfig.Instance.GetDNSItem(ECoreType.sing_box);
+                    var normalDNS = item?.normalDNS;
+                    if (string.IsNullOrWhiteSpace(normalDNS))
+                    {
+                        return 0;
+                    }
+
+                    var obj = Utils.ParseJson(normalDNS);
+                    if (obj?.ContainsKey("servers") == true)
+                    {
+                        singboxConfig.dns = obj;
+                    }
                 }
             }
             catch (Exception ex)
