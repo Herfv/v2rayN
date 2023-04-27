@@ -881,7 +881,7 @@
     <value>移除所选规则</value>
   </data>
   <data name="menuRoutingAdvancedSetDefault" xml:space="preserve">
-    <value>设为活动规则</value>
+    <value>设为活动规则 (Enter)</value>
   </data>
   <data name="menuRoutingBasic" xml:space="preserve">
     <value>基础功能</value>
@@ -896,7 +896,7 @@
     <value>域名解析策略</value>
   </data>
   <data name="TbenableRoutingAdvanced" xml:space="preserve">
-    <value>启用路由高级功能</value>
+    <value>启用高级功能</value>
   </data>
   <data name="TbRoutingTabBlock" xml:space="preserve">
     <value>3.阻止的Domain或IP</value>
@@ -1119,5 +1119,11 @@
   </data>
   <data name="TbDnsSingboxObjectDoc" xml:space="preserve">
     <value>请填写 DNS JSON 结构，点击查看文档</value>
+  </data>
+  <data name="TBSettingDnsImportDefConfig" xml:space="preserve">
+    <value>点击导入默认DNS配置</value>
+  </data>
+  <data name="TbdomainStrategy4Singbox" xml:space="preserve">
+    <value>Sing-box域名解析策略</value>
   </data>
 </root>

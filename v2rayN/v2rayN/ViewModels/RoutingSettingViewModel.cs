@@ -43,6 +43,9 @@ namespace v2rayN.ViewModels
         public string domainMatcher { get; set; }
 
         [Reactive]
+        public string domainStrategy4Singbox { get; set; }
+
+        [Reactive]
         public string ProxyDomain { get; set; }
 
         [Reactive]
@@ -83,6 +86,7 @@ namespace v2rayN.ViewModels
             enableRoutingAdvanced = _config.routingBasicItem.enableRoutingAdvanced;
             domainStrategy = _config.routingBasicItem.domainStrategy;
             domainMatcher = _config.routingBasicItem.domainMatcher;
+            domainStrategy4Singbox = _config.routingBasicItem.domainStrategy4Singbox;
 
             RefreshRoutingItems();
 
@@ -200,6 +204,7 @@ namespace v2rayN.ViewModels
             _config.routingBasicItem.domainStrategy = domainStrategy;
             _config.routingBasicItem.enableRoutingAdvanced = enableRoutingAdvanced;
             _config.routingBasicItem.domainMatcher = domainMatcher;
+            _config.routingBasicItem.domainStrategy4Singbox = domainStrategy4Singbox;
 
             EndBindingLockedData();
 
@@ -275,7 +280,7 @@ namespace v2rayN.ViewModels
             IsModified = true;
         }
 
-        private void RoutingAdvancedSetDefault()
+        public void RoutingAdvancedSetDefault()
         {
             var item = LazyConfig.Instance.GetRoutingItem(SelectedSource?.id);
             if (item is null)

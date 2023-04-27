@@ -77,8 +77,8 @@ namespace v2rayN.Handler
                         singboxConfig.log.level = _config.coreBasicItem.loglevel;
                         break;
 
-                    case "warn":
-                        singboxConfig.log.level = "warning";
+                    case "warning":
+                        singboxConfig.log.level = "warn";
                         break;
 
                     default:
@@ -133,6 +133,7 @@ namespace v2rayN.Handler
                     inbound.listen_port = LazyConfig.Instance.GetLocalPort(Global.InboundSocks);
                     inbound.sniff = _config.inbound[0].sniffingEnabled;
                     inbound.sniff_override_destination = _config.inbound[0].routeOnly ? false : _config.inbound[0].sniffingEnabled;
+                    inbound.domain_strategy = Utils.IsNullOrEmpty(_config.routingBasicItem.domainStrategy4Singbox) ? null: _config.routingBasicItem.domainStrategy4Singbox;
 
                     //http
                     var inbound2 = GetInbound(inbound, Global.InboundHttp, 1, false);
@@ -322,6 +323,7 @@ namespace v2rayN.Handler
                             public_key = node.publicKey,
                             short_id = node.shortId
                         };
+                        tls.insecure = false;
                     }
                     outbound.tls = tls;
                 }
@@ -639,7 +641,19 @@ namespace v2rayN.Handler
             {
                 if (_config.tunModeItem.enableTun)
                 {
-                    var tunDNS = Utils.GetEmbedText(Global.TunSingboxDNSFileName);
+                    string tunDNS = String.Empty;
+                    if (_config.tunModeItem.bypassMode)
+                    {
+                        tunDNS = _config.tunModeItem.directDNS;
+                    }
+                    else
+                    {
+                        tunDNS = _config.tunModeItem.proxyDNS;
+                    }
+                    if (tunDNS.IsNullOrEmpty() || Utils.ParseJson(tunDNS)?.ContainsKey("servers") == false)
+                    {
+                        tunDNS = Utils.GetEmbedText(Global.TunSingboxDNSFileName);
+                    }
                     var obj = Utils.ParseJson(tunDNS);
                     singboxConfig.dns = obj;
                 }
@@ -649,7 +663,7 @@ namespace v2rayN.Handler
                     var normalDNS = item?.normalDNS;
                     if (string.IsNullOrWhiteSpace(normalDNS))
                     {
-                        return 0;
+                        normalDNS = "{\"servers\":[{\"address\":\"tcp://8.8.8.8\"}]}";
                     }
 
                     var obj = Utils.ParseJson(normalDNS);

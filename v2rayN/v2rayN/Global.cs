@@ -27,16 +27,21 @@
         public const string ConfigFileName = "guiNConfig.json";
         public const string ConfigDB = "guiNDB.db";
         public const string coreConfigFileName = "config.json";
+
         public const string v2raySampleClient = "v2rayN.Sample.SampleClientConfig";
         public const string SingboxSampleClient = "v2rayN.Sample.SingboxSampleClientConfig";
         public const string v2raySampleHttprequestFileName = "v2rayN.Sample.SampleHttprequest";
         public const string v2raySampleHttpresponseFileName = "v2rayN.Sample.SampleHttpresponse";
-        public const string CustomRoutingFileName = "v2rayN.Sample.custom_routing_";
         public const string v2raySampleInbound = "v2rayN.Sample.SampleInbound";
+        public const string CustomRoutingFileName = "v2rayN.Sample.custom_routing_";
+
         public const string TunSingboxFileName = "v2rayN.Sample.tun_singbox";
         public const string TunSingboxDNSFileName = "v2rayN.Sample.tun_singbox_dns";
         public const string TunSingboxInboundFileName = "v2rayN.Sample.tun_singbox_inbound";
         public const string TunSingboxRulesFileName = "v2rayN.Sample.tun_singbox_rules";
+
+        public const string DNSV2rayNormalFileName = "v2rayN.Sample.dns_v2ray_normal";
+        public const string DNSSingboxNormalFileName = "v2rayN.Sample.dns_singbox_normal";
 
         public const string DefaultSecurity = "auto";
         public const string DefaultNetwork = "tcp";
@@ -136,6 +141,7 @@
         public static readonly List<string> coreTypes = new() { "v2fly", "SagerNet", "Xray", "v2fly_v5", "sing_box" };
         public static readonly List<string> coreTypes4VLESS = new() { "Xray", "sing_box" };
         public static readonly List<string> domainStrategys = new() { "AsIs", "IPIfNonMatch", "IPOnDemand" };
+        public static readonly List<string> domainStrategys4Singbox = new() { "ipv4_only", "ipv6_only", "prefer_ipv4", "prefer_ipv6", "" };
         public static readonly List<string> domainMatchers = new() { "linear", "mph", "" };
         public static readonly List<string> fingerprints = new() { "chrome", "firefox", "safari", "ios", "android", "edge", "360", "qq", "random", "randomized", "" };
         public static readonly List<string> userAgent = new() { "chrome", "firefox", "safari", "edge", "none" };

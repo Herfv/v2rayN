@@ -881,7 +881,7 @@
     <value>Remove selected</value>
   </data>
   <data name="menuRoutingAdvancedSetDefault" xml:space="preserve">
-    <value>Set as active rule</value>
+    <value>Set as active rule(Enter)</value>
   </data>
   <data name="menuRoutingBasic" xml:space="preserve">
     <value>Basic Function</value>
@@ -1122,5 +1122,11 @@
   </data>
   <data name="TbDnsSingboxObjectDoc" xml:space="preserve">
     <value>Please fill in DNS Structure, Click to view the document</value>
+  </data>
+  <data name="TBSettingDnsImportDefConfig" xml:space="preserve">
+    <value>Click to import default DNS config</value>
+  </data>
+  <data name="TbdomainStrategy4Singbox" xml:space="preserve">
+    <value>Sing-box domain strategy</value>
   </data>
 </root>

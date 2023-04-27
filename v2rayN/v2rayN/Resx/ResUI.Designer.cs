@@ -1024,7 +1024,7 @@ namespace v2rayN.Resx {
         }
         
         /// <summary>
-        ///   查找类似 Set as active rule 的本地化字符串。
+        ///   查找类似 Set as active rule(Enter) 的本地化字符串。
         /// </summary>
         public static string menuRoutingAdvancedSetDefault {
             get {
@@ -1961,6 +1961,15 @@ namespace v2rayN.Resx {
         }
         
         /// <summary>
+        ///   查找类似 Sing-box domain strategy 的本地化字符串。
+        /// </summary>
+        public static string TbdomainStrategy4Singbox {
+            get {
+                return ResourceManager.GetString("TbdomainStrategy4Singbox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Edit 的本地化字符串。
         /// </summary>
         public static string TbEdit {
@@ -2254,6 +2263,15 @@ namespace v2rayN.Resx {
         public static string TbSetSystemProxy {
             get {
                 return ResourceManager.GetString("TbSetSystemProxy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Click to import default DNS config 的本地化字符串。
+        /// </summary>
+        public static string TBSettingDnsImportDefConfig {
+            get {
+                return ResourceManager.GetString("TBSettingDnsImportDefConfig", resourceCulture);
             }
         }
         
