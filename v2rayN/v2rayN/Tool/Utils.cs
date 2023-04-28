@@ -466,6 +466,15 @@ namespace v2rayN
             return Convert.TryFromBase64String(plainText, buffer, out int _);
         }
 
+        public static string Convert2Comma(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return text;
+            }
+            return text.Replace("，", ",").Replace(Environment.NewLine, ",");
+        }
+
         #endregion 转换函数
 
         #region 数据检查
@@ -554,14 +563,7 @@ namespace v2rayN
                 return false;
             }
 
-            //清除要验证字符串中的空格
-            //domain = domain.TrimEx();
-
-            //模式字符串
-            string pattern = @"^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$";
-
-            //验证
-            return IsMatch(domain, pattern);
+            return Uri.CheckHostName(domain) == UriHostNameType.Dns;
         }
 
         /// <summary>
