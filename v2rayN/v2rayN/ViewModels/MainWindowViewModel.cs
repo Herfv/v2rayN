@@ -1460,12 +1460,7 @@ namespace v2rayN.ViewModels
 
         private void CheckUpdateGeo()
         {
-            Task.Run(() =>
-            {
-                var updateHandle = new UpdateHandle();
-                updateHandle.UpdateGeoFile("geosite", _config, UpdateTaskHandler);
-                updateHandle.UpdateGeoFile("geoip", _config, UpdateTaskHandler);
-            });
+            (new UpdateHandle()).UpdateGeoFileAll(_config, UpdateTaskHandler);
         }
 
         #endregion CheckUpdate
@@ -1820,7 +1815,7 @@ namespace v2rayN.ViewModels
             if (_config.uiItem.autoHideStartup)
             {
                 Observable.Range(1, 1)
-                 .Delay(TimeSpan.FromSeconds(1))
+                 .Delay(TimeSpan.FromSeconds(2))
                  .Subscribe(x =>
                  {
                      Application.Current.Dispatcher.Invoke(() =>
