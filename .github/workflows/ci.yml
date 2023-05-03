@@ -21,7 +21,7 @@ jobs:
         run: |
           cd v2rayN
           msbuild --restore
-          msbuild v2rayN.sln /m /p:Configuration=Release /p:WebProjectOutputDir=D:\a\v2rayN\v2rayN\v2rayN\output /p:OutputPath=D:\a\v2rayN\v2rayN\v2rayN\output\bin /p:Platform="Any CPU"
+          msbuild v2rayN.sln /m /p:Configuration=Release /p:OutputPath=D:\a\v2rayN\v2rayN\v2rayN\output\bin /p:Platform="Any CPU"
       - name: Upload
         uses: actions/upload-artifact@v3.1.1
         with:
