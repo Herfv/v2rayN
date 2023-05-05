@@ -258,6 +258,11 @@ namespace v2rayN.Handler
                     outbound.flow = node.flow;
 
                     outbound.packet_encoding = "xudp";
+
+                    if (Utils.IsNullOrEmpty(node.flow))
+                    {
+                        outboundMux(node, outbound);
+                    }
                 }
                 else if (node.configType == EConfigType.Trojan)
                 {
@@ -288,10 +293,11 @@ namespace v2rayN.Handler
                     var mux = new Multiplex4Sbox()
                     {
                         enabled = true,
-                        protocol = "smux",
-                        max_connections = 4,
-                        min_streams = 4,
-                        max_streams = 0,
+                        protocol = _config.mux4Sbox.protocol,
+                        max_connections = _config.mux4Sbox.max_connections,
+                        min_streams = _config.mux4Sbox.min_streams,
+                        max_streams = _config.mux4Sbox.max_streams,
+                        padding = _config.mux4Sbox.padding
                     };
                     outbound.multiplex = mux;
                 }
