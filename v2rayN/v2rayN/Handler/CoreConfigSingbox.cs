@@ -288,19 +288,19 @@ namespace v2rayN.Handler
         {
             try
             {
-                if (_config.coreBasicItem.muxEnabled)
-                {
-                    var mux = new Multiplex4Sbox()
-                    {
-                        enabled = true,
-                        protocol = _config.mux4Sbox.protocol,
-                        max_connections = _config.mux4Sbox.max_connections,
-                        min_streams = _config.mux4Sbox.min_streams,
-                        max_streams = _config.mux4Sbox.max_streams,
-                        padding = _config.mux4Sbox.padding
-                    };
-                    outbound.multiplex = mux;
-                }
+                //if (_config.coreBasicItem.muxEnabled)
+                //{
+                //    var mux = new Multiplex4Sbox()
+                //    {
+                //        enabled = true,
+                //        protocol = _config.mux4Sbox.protocol,
+                //        max_connections = _config.mux4Sbox.max_connections,
+                //        min_streams = _config.mux4Sbox.min_streams,
+                //        max_streams = _config.mux4Sbox.max_streams,
+                //        padding = _config.mux4Sbox.padding
+                //    };
+                //    outbound.multiplex = mux;
+                //}
             }
             catch (Exception ex)
             {
@@ -315,10 +315,19 @@ namespace v2rayN.Handler
             {
                 if (node.streamSecurity == Global.StreamSecurityReality || node.streamSecurity == Global.StreamSecurity)
                 {
+                    var server_name = string.Empty;
+                    if (!string.IsNullOrWhiteSpace(node.sni))
+                    {
+                        server_name = node.sni;
+                    }
+                    else if (!string.IsNullOrWhiteSpace(node.requestHost))
+                    {
+                        server_name = Utils.String2List(node.requestHost)[0];
+                    }
                     var tls = new Tls4Sbox()
                     {
                         enabled = true,
-                        server_name = node.sni,
+                        server_name = server_name,
                         insecure = Utils.ToBool(node.allowInsecure.IsNullOrEmpty() ? _config.coreBasicItem.defAllowInsecure.ToString().ToLower() : node.allowInsecure),
                         alpn = node.GetAlpn(),
                     };
@@ -666,24 +675,21 @@ namespace v2rayN.Handler
                     return 0;
                 }
                 //Add the dns of the remote server domain
-                if (Utils.IsDomain(node.address))
+                if (dns4Sbox.rules is null)
                 {
-                    if (dns4Sbox.rules is null)
-                    {
-                        dns4Sbox.rules = new();
-                    }
-                    dns4Sbox.servers.Add(new()
-                    {
-                        tag = "local_local",
-                        address = "223.5.5.5",
-                        detour = "direct"
-                    });
-                    dns4Sbox.rules.Add(new()
-                    {
-                        server = "local_local",
-                        domain = new List<string>() { node.address }
-                    });
+                    dns4Sbox.rules = new();
                 }
+                dns4Sbox.servers.Add(new()
+                {
+                    tag = "local_local",
+                    address = "223.5.5.5",
+                    detour = "direct"
+                });
+                dns4Sbox.rules.Add(new()
+                {
+                    server = "local_local",
+                    outbound = "any"
+                });
 
                 singboxConfig.dns = dns4Sbox;
             }
