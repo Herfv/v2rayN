@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
-using v2rayN.Base;
 using v2rayN.Mode;
 using v2rayN.Resx;
 
@@ -222,7 +221,7 @@ namespace v2rayN.Handler
                     //more url
                     if (Utils.IsNullOrEmpty(item.convertTarget) && !Utils.IsNullOrEmpty(item.moreUrl.TrimEx()))
                     {
-                        if (!Utils.IsNullOrEmpty(result) && Utils.IsBase64String(result))
+                        if (!Utils.IsNullOrEmpty(result) && Utils.IsBase64String(result!))
                         {
                             result = Utils.Base64Decode(result);
                         }
@@ -246,7 +245,7 @@ namespace v2rayN.Handler
                             }
                             if (!Utils.IsNullOrEmpty(result2))
                             {
-                                if (Utils.IsBase64String(result2))
+                                if (Utils.IsBase64String(result2!))
                                 {
                                     result += Utils.Base64Decode(result2);
                                 }

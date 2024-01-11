@@ -5,7 +5,6 @@ using ReactiveUI.Fody.Helpers;
 using Splat;
 using System.Reactive;
 using System.Windows;
-using v2rayN.Base;
 using v2rayN.Handler;
 using v2rayN.Mode;
 using v2rayN.Resx;
@@ -81,9 +80,9 @@ namespace v2rayN.ViewModels
             {
                 ImportRulesFromClipboard();
             });
-            ImportRulesFromUrlCmd = ReactiveCommand.Create(() =>
+            ImportRulesFromUrlCmd = ReactiveCommand.CreateFromTask(() =>
             {
-                ImportRulesFromUrl();
+                return ImportRulesFromUrl();
             });
 
             RuleRemoveCmd = ReactiveCommand.Create(() =>
@@ -143,7 +142,7 @@ namespace v2rayN.ViewModels
 
         public void RuleEdit(bool blNew)
         {
-            RulesItem item;
+            RulesItem? item;
             if (blNew)
             {
                 item = new();

@@ -15,7 +15,6 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
-using v2rayN.Base;
 using v2rayN.Handler;
 using v2rayN.Mode;
 using v2rayN.Resx;
@@ -1133,7 +1132,7 @@ namespace v2rayN.ViewModels
                 _noticeHandler?.Enqueue(ResUI.PleaseSelectServer);
                 return;
             }
-            string url = ShareHandler.GetShareUrl(item);
+            var url = ShareHandler.GetShareUrl(item);
             if (Utils.IsNullOrEmpty(url))
             {
                 return;

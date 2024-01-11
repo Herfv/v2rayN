@@ -206,7 +206,7 @@ namespace v2rayN
             {
                 return Convert.ToInt32(obj);
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
                 //SaveLog(ex.Message, ex);
                 return 0;
@@ -219,7 +219,7 @@ namespace v2rayN
             {
                 return Convert.ToBoolean(obj);
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
                 //SaveLog(ex.Message, ex);
                 return false;
@@ -232,7 +232,7 @@ namespace v2rayN
             {
                 return obj?.ToString() ?? string.Empty;
             }
-            catch (Exception ex)
+            catch// (Exception ex)
             {
                 //SaveLog(ex.Message, ex);
                 return string.Empty;
@@ -524,7 +524,7 @@ namespace v2rayN
                 Logging.SaveLog(ex.Message, ex);
             }
         }
-         
+
 
         /// <summary>
         /// 获取启动了应用程序的可执行文件的路径
@@ -546,7 +546,7 @@ namespace v2rayN
         /// <returns></returns>
         public static string GetExePath()
         {
-            return Environment.ProcessPath;
+            return Environment.ProcessPath ?? string.Empty;
         }
 
         public static string StartupPath()
