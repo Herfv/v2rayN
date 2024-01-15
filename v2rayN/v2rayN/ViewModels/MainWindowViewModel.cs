@@ -88,6 +88,7 @@ namespace v2rayN.ViewModels
         public ReactiveCommand<Unit, Unit> AddTrojanServerCmd { get; }
         public ReactiveCommand<Unit, Unit> AddHysteria2ServerCmd { get; }
         public ReactiveCommand<Unit, Unit> AddTuicServerCmd { get; }
+        public ReactiveCommand<Unit, Unit> AddWireguardServerCmd { get; }
         public ReactiveCommand<Unit, Unit> AddCustomServerCmd { get; }
         public ReactiveCommand<Unit, Unit> AddServerViaClipboardCmd { get; }
         public ReactiveCommand<Unit, Unit> AddServerViaScanCmd { get; }
@@ -346,6 +347,10 @@ namespace v2rayN.ViewModels
             AddTuicServerCmd = ReactiveCommand.Create(() =>
             {
                 EditServer(true, EConfigType.Tuic);
+            });
+            AddWireguardServerCmd = ReactiveCommand.Create(() =>
+            {
+                EditServer(true, EConfigType.Wireguard);
             });
             AddCustomServerCmd = ReactiveCommand.Create(() =>
             {
@@ -1390,7 +1395,8 @@ namespace v2rayN.ViewModels
             {
                 Process.Start(startInfo);
                 MyAppExit(false);
-            } catch { }
+            }
+            catch { }
         }
 
         private void ImportOldGuiConfig()
@@ -1620,11 +1626,11 @@ namespace v2rayN.ViewModels
             if (_config.tunModeItem.enableTun != EnableTun)
             {
                 _config.tunModeItem.enableTun = EnableTun;
-                // 非管理员运行时tun模式开启逻辑修改
+                // When running as a non-administrator, reboot to administrator mode
                 if (EnableTun && !Utils.IsAdministrator())
                 {
+                    _config.tunModeItem.enableTun = false;
                     RebootAsAdmin();
-                    _config.tunModeItem.enableTun = EnableTun = false;
                     return;
                 }
                 Reload();
