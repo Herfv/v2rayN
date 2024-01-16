@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using Microsoft.Win32.TaskScheduler;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -13,7 +14,6 @@ using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -200,11 +200,11 @@ namespace v2rayN
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static int ToInt(object obj)
+        public static int ToInt(object? obj)
         {
             try
             {
-                return Convert.ToInt32(obj);
+                return Convert.ToInt32(obj ?? string.Empty);
             }
             catch //(Exception ex)
             {
@@ -302,7 +302,33 @@ namespace v2rayN
 
         public static string UrlDecode(string url)
         {
-            return HttpUtility.UrlDecode(url);
+            return Uri.UnescapeDataString(url);
+            //return HttpUtility.UrlDecode(url);
+        }
+
+        public static NameValueCollection ParseQueryString(string query)
+        {
+            var result = new NameValueCollection(StringComparer.OrdinalIgnoreCase);
+            if (IsNullOrEmpty(query))
+            {
+                return result;
+            }
+
+            var parts = query[1..].Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var part in parts)
+            {
+                var keyValue = part.Split(['=']);
+                if (keyValue.Length != 2)
+                {
+                    continue;
+                }
+                var key = Uri.UnescapeDataString(keyValue[0]);
+                var val = Uri.UnescapeDataString(keyValue[1]);
+
+                result.Add(key, val);
+            }
+
+            return result;
         }
 
         public static string GetMD5(string str)
