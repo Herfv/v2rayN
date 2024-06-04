@@ -1,9 +1,10 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
+using v2rayN.Enums;
 using v2rayN.Models;
 using v2rayN.Resx;
 
-namespace v2rayN.Handler
+namespace v2rayN.Handler.CoreConfig
 {
     internal class CoreConfigSingbox
     {
@@ -119,7 +120,7 @@ namespace v2rayN.Handler
                 var listen = "::";
                 singboxConfig.inbounds = [];
 
-                if (!_config.tunModeItem.enableTun || (_config.tunModeItem.enableTun && _config.tunModeItem.enableExInbound))
+                if (!_config.tunModeItem.enableTun || _config.tunModeItem.enableTun && _config.tunModeItem.enableExInbound)
                 {
                     var inbound = new Inbound4Sbox()
                     {
