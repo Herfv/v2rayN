@@ -8,12 +8,14 @@ namespace ServiceLib.Handler
     /// </summary>
     public class CoreHandler
     {
+        private static readonly Lazy<CoreHandler> _instance = new(() => new());
+        public static CoreHandler Instance => _instance.Value;
         private Config _config;
         private Process? _process;
         private Process? _processPre;
         private Action<bool, string> _updateFunc;
 
-        public CoreHandler(Config config, Action<bool, string> update)
+        public void Init(Config config, Action<bool, string> update)
         {
             _config = config;
             _updateFunc = update;
@@ -182,7 +184,7 @@ namespace ServiceLib.Handler
             //{
             //    coreType = LazyConfig.Instance.GetCoreType(node, node.configType);
             //}
-            var coreType = LazyConfig.Instance.GetCoreType(node, node.configType);
+            var coreType = AppHandler.Instance.GetCoreType(node, node.configType);
             _config.runningCoreType = coreType;
             var coreInfo = CoreInfoHandler.Instance.GetCoreInfo(coreType);
 
@@ -207,7 +209,7 @@ namespace ServiceLib.Handler
                         configType = EConfigType.SOCKS,
                         address = Global.Loopback,
                         sni = node.address, //Tun2SocksAddress
-                        port = LazyConfig.Instance.GetLocalPort(EInboundProtocol.socks)
+                        port = AppHandler.Instance.GetLocalPort(EInboundProtocol.socks)
                     };
                 }
                 else if ((node.configType == EConfigType.Custom && node.preSocksPort > 0))
@@ -339,7 +341,7 @@ namespace ServiceLib.Handler
                     startUpSuccessful = true;
                 }
 
-                LazyConfig.Instance.AddProcess(proc.Handle);
+                AppHandler.Instance.AddProcess(proc.Handle);
                 return proc;
             }
             catch (Exception ex)
