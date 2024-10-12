@@ -150,7 +150,7 @@ namespace ServiceLib.ViewModels
             _updateView = updateView;
             _isAdministrator = isAdministrator;
 
-            MessageBus.Current.Listen<string>(Global.CommandRefreshProfiles).Subscribe(async x => await _updateView?.Invoke(EViewAction.DispatcherRefreshServersBiz, null));
+            MessageBus.Current.Listen<string>(EMsgCommand.RefreshProfiles.ToString()).Subscribe(async x => await _updateView?.Invoke(EViewAction.DispatcherRefreshServersBiz, null));
 
             SelectedRouting = new();
             SelectedServer = new();
@@ -342,6 +342,7 @@ namespace ServiceLib.ViewModels
 
             TaskHandler.Instance.RegUpdateTask(_config, UpdateTaskHandler);
             RefreshRoutingsMenu();
+            InboundDisplayStaus();
             //RefreshServers();
 
             Reload();
@@ -453,7 +454,7 @@ namespace ServiceLib.ViewModels
 
         private void RefreshServers()
         {
-            MessageBus.Current.SendMessage("", Global.CommandRefreshProfiles);
+            MessageBus.Current.SendMessage("", EMsgCommand.RefreshProfiles.ToString());
         }
 
         public void RefreshServersBiz()
@@ -657,6 +658,7 @@ namespace ServiceLib.ViewModels
             var ret = await _updateView?.Invoke(EViewAction.OptionSettingWindow, null);
             if (ret == true)
             {
+                InboundDisplayStaus();
                 //RefreshServers();
                 Reload();
             }
@@ -795,8 +797,6 @@ namespace ServiceLib.ViewModels
             BlSystemProxySet = (type == ESysProxyType.ForcedChange);
             BlSystemProxyNothing = (type == ESysProxyType.Unchanged);
             BlSystemProxyPac = (type == ESysProxyType.Pac);
-
-            InboundDisplayStaus();
 
             if (blChange)
             {
