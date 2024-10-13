@@ -15,7 +15,6 @@ namespace ServiceLib.ViewModels
 
         private List<ProfileItem> _lstProfile;
         private string _serverFilter = string.Empty;
-
         private Dictionary<string, bool> _dicHeaderSort = new();
         private SpeedtestService? _speedtestHandler;
 
@@ -98,10 +97,13 @@ namespace ServiceLib.ViewModels
         public ProfilesViewModel(Func<EViewAction, object?, Task<bool>>? updateView)
         {
             _config = AppHandler.Instance.Config;
-
             _updateView = updateView;
 
-            MessageBus.Current.Listen<string>(EMsgCommand.RefreshProfiles.ToString()).Subscribe(async x => await _updateView?.Invoke(EViewAction.DispatcherRefreshServersBiz, null));
+            if (_updateView != null)
+            {
+                MessageBus.Current.Listen<string>(EMsgCommand.RefreshProfiles.ToString())
+                    .Subscribe(async x => await _updateView?.Invoke(EViewAction.DispatcherRefreshServersBiz, null));
+            }
 
             SelectedProfile = new();
             SelectedSub = new();
@@ -505,7 +507,7 @@ namespace ServiceLib.ViewModels
             SetDefaultServer(SelectedProfile.indexId);
         }
 
-        private async Task SetDefaultServer(string indexId)
+        public async Task SetDefaultServer(string indexId)
         {
             if (Utils.IsNullOrEmpty(indexId))
             {
