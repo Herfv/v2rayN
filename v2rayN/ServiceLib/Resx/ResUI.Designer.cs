@@ -3005,6 +3005,15 @@ namespace ServiceLib.Resx {
         }
         
         /// <summary>
+        ///   查找类似 Geo files source (optional) 的本地化字符串。
+        /// </summary>
+        public static string TbSettingsGeoFilesSource {
+            get {
+                return ResourceManager.GetString("TbSettingsGeoFilesSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 HTTP Port 的本地化字符串。
         /// </summary>
         public static string TbSettingsHttpPort {
@@ -3685,6 +3694,15 @@ namespace ServiceLib.Resx {
         public static string UpdateStandalonePackageTip {
             get {
                 return ResourceManager.GetString("UpdateStandalonePackageTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 UpgradeApp does not exist 的本地化字符串。
+        /// </summary>
+        public static string UpgradeAppNotExistTip {
+            get {
+                return ResourceManager.GetString("UpgradeAppNotExistTip", resourceCulture);
             }
         }
     }

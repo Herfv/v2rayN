@@ -197,9 +197,18 @@ namespace ServiceLib.Handler.Fmt
 
         protected static string WriteAllText(string strData, string ext = "json")
         {
-            var fileName = Utils.GetTempPath($"{Utils.GetGUID(false)}.{ext}");
+            var fileName = Utils.GetTempPath($"{Utils.GetGuid(false)}.{ext}");
             File.WriteAllText(fileName, strData);
             return fileName;
+        }
+        protected static string ToUri(EConfigType eConfigType, string address, object port, string userInfo, Dictionary<string, string>? dicQuery, string? remark)
+        {
+            var query = dicQuery != null
+                ? ("?" + string.Join("&", dicQuery.Select(x => x.Key + "=" + x.Value).ToArray()))
+                : string.Empty;
+
+            var url = $"{Utils.UrlEncode(userInfo)}@{GetIpv6(address)}:{port}";
+            return $"{Global.ProtocolShares[eConfigType]}{url}{query}{remark}";
         }
     }
 }

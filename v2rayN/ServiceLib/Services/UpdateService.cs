@@ -56,7 +56,7 @@ namespace ServiceLib.Services
                 _updateFunc?.Invoke(false, args.Msg);
 
                 url = args.Url;
-                fileName = Utils.GetTempPath(Utils.GetGUID());
+                fileName = Utils.GetTempPath(Utils.GetGuid());
                 await downloadHandle.DownloadFileAsync(url, fileName, true, _timeout);
             }
             else
@@ -108,7 +108,7 @@ namespace ServiceLib.Services
 
                 url = args.Url;
                 var ext = Path.GetExtension(url);
-                fileName = Utils.GetTempPath(Utils.GetGUID() + ext);
+                fileName = Utils.GetTempPath(Utils.GetGuid() + ext);
                 await downloadHandle.DownloadFileAsync(url, fileName, true, _timeout);
             }
             else
@@ -255,8 +255,8 @@ namespace ServiceLib.Services
 
         public async Task UpdateGeoFileAll(Config config, Action<bool, string> updateFunc)
         {
-            await UpdateGeoFile("geosite", _config, updateFunc);
-            await UpdateGeoFile("geoip", _config, updateFunc);
+            await UpdateGeoFile("geosite", config, updateFunc);
+            await UpdateGeoFile("geoip", config, updateFunc);
             _updateFunc?.Invoke(true, string.Format(ResUI.MsgDownloadGeoFileSuccessfully, "geo"));
         }
 
@@ -423,7 +423,7 @@ namespace ServiceLib.Services
                     && File.Exists(Path.Combine(Utils.StartupPath(), "D3DCompiler_47_cor3.dll"))
                     )
                 {
-                    return coreInfo?.DownloadUrlWin64?.Replace("v2rayN.zip", "zz_v2rayN-SelfContained.zip");
+                    return coreInfo?.DownloadUrlWin64?.Replace(".zip", "-SelfContained.zip");
                 }
 
                 return RuntimeInformation.ProcessArchitecture switch
@@ -450,8 +450,12 @@ namespace ServiceLib.Services
         {
             _config = config;
             _updateFunc = updateFunc;
+
+            var geoUrl = string.IsNullOrEmpty(config?.constItem.geoSourceUrl)
+                ? Global.GeoUrl
+                : config.constItem.geoSourceUrl;
             var url = string.Format(Global.GeoUrl, geoName);
-            var fileName = Utils.GetTempPath(Utils.GetGUID());
+            var fileName = Utils.GetTempPath(Utils.GetGuid());
 
             DownloadService downloadHandle = new();
             downloadHandle.UpdateCompleted += (sender2, args) =>

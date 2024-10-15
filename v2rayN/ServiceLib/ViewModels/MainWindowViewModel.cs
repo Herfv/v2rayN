@@ -280,14 +280,21 @@ namespace ServiceLib.ViewModels
             }
         }
 
-        public async Task UpgradeApp(string fileName)
+        public async Task UpgradeApp(string arg)
         {
+            if (!Utils.UpgradeAppExists(out var fileName))
+            {
+                NoticeHandler.Instance.SendMessageAndEnqueue(ResUI.UpgradeAppNotExistTip);
+                Logging.SaveLog("UpgradeApp does not exist");
+                return;
+            }
+
             Process process = new()
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "AmazTool",
-                    Arguments = fileName.AppendQuotes(),
+                    FileName = fileName,
+                    Arguments = arg.AppendQuotes(),
                     WorkingDirectory = Utils.StartupPath()
                 }
             };
@@ -414,7 +421,7 @@ namespace ServiceLib.ViewModels
             var ret = await _updateView?.Invoke(EViewAction.OptionSettingWindow, null);
             if (ret == true)
             {
-                Locator.Current.GetService<StatusBarViewModel>()?.InboundDisplayStaus();
+                Locator.Current.GetService<StatusBarViewModel>()?.InboundDisplayStatus();
                 Reload();
             }
         }

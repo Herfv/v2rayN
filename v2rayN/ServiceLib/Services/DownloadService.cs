@@ -30,7 +30,7 @@ namespace ServiceLib.Services
         {
             try
             {
-                Utils.SetSecurityProtocol(AppHandler.Instance.Config.guiItem.enableSecurityProtocolTls13);
+                SetSecurityProtocol(AppHandler.Instance.Config.guiItem.enableSecurityProtocolTls13);
 
                 var progress = new Progress<string>();
                 progress.ProgressChanged += (sender, value) =>
@@ -62,7 +62,7 @@ namespace ServiceLib.Services
         {
             try
             {
-                Utils.SetSecurityProtocol(AppHandler.Instance.Config.guiItem.enableSecurityProtocolTls13);
+                SetSecurityProtocol(AppHandler.Instance.Config.guiItem.enableSecurityProtocolTls13);
                 UpdateCompleted?.Invoke(this, new ResultEventArgs(false, $"{ResUI.Downloading}   {url}"));
 
                 var progress = new Progress<double>();
@@ -92,7 +92,7 @@ namespace ServiceLib.Services
 
         public async Task<string?> UrlRedirectAsync(string url, bool blProxy)
         {
-            Utils.SetSecurityProtocol(AppHandler.Instance.Config.guiItem.enableSecurityProtocolTls13);
+            SetSecurityProtocol(AppHandler.Instance.Config.guiItem.enableSecurityProtocolTls13);
             var webRequestHandler = new SocketsHttpHandler
             {
                 AllowAutoRedirect = false,
@@ -100,7 +100,7 @@ namespace ServiceLib.Services
             };
             HttpClient client = new(webRequestHandler);
 
-            HttpResponseMessage response = await client.GetAsync(url);
+            var response = await client.GetAsync(url);
             if (response.StatusCode == HttpStatusCode.Redirect && response.Headers.Location is not null)
             {
                 return response.Headers.Location.ToString();
@@ -181,7 +181,7 @@ namespace ServiceLib.Services
         {
             try
             {
-                Utils.SetSecurityProtocol(AppHandler.Instance.Config.guiItem.enableSecurityProtocolTls13);
+                SetSecurityProtocol(AppHandler.Instance.Config.guiItem.enableSecurityProtocolTls13);
                 var webProxy = GetWebProxy(blProxy);
                 var client = new HttpClient(new SocketsHttpHandler()
                 {
@@ -226,7 +226,7 @@ namespace ServiceLib.Services
         {
             try
             {
-                Utils.SetSecurityProtocol(AppHandler.Instance.Config.guiItem.enableSecurityProtocolTls13);
+                SetSecurityProtocol(AppHandler.Instance.Config.guiItem.enableSecurityProtocolTls13);
 
                 var webProxy = GetWebProxy(blProxy);
 
@@ -253,15 +253,12 @@ namespace ServiceLib.Services
         {
             try
             {
-                if (webProxy == null)
-                {
-                    webProxy = GetWebProxy(true);
-                }
+                webProxy ??= GetWebProxy(true);
 
                 try
                 {
                     var config = AppHandler.Instance.Config;
-                    int responseTime = await GetRealPingTime(config.speedTestItem.speedPingTestUrl, webProxy, 10);
+                    var responseTime = await GetRealPingTime(config.speedTestItem.speedPingTestUrl, webProxy, 10);
                     return responseTime;
                 }
                 catch (Exception ex)
@@ -279,7 +276,7 @@ namespace ServiceLib.Services
 
         public async Task<int> GetRealPingTime(string url, IWebProxy? webProxy, int downloadTimeout)
         {
-            int responseTime = -1;
+            var responseTime = -1;
             try
             {
                 using var cts = new CancellationTokenSource();
@@ -290,8 +287,8 @@ namespace ServiceLib.Services
                     UseProxy = webProxy != null
                 });
 
-                List<int> oneTime = [];
-                for (int i = 0; i < 2; i++)
+                List<int> oneTime = new();
+                for (var i = 0; i < 2; i++)
                 {
                     var timer = Stopwatch.StartNew();
                     await client.GetAsync(url, cts.Token);
@@ -336,6 +333,19 @@ namespace ServiceLib.Services
             {
                 return false;
             }
+        }
+
+        private static void SetSecurityProtocol(bool enableSecurityProtocolTls13)
+        {
+            if (enableSecurityProtocolTls13)
+            {
+                ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
+            }
+            else
+            {
+                ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
+            }
+            ServicePointManager.DefaultConnectionLimit = 256;
         }
     }
 }
