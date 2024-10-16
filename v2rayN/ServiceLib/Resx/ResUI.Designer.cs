@@ -3230,6 +3230,15 @@ namespace ServiceLib.Resx {
         }
         
         /// <summary>
+        ///   查找类似 sing-box ruleset files source (optional) 的本地化字符串。
+        /// </summary>
+        public static string TbSettingsSrsFilesSource {
+            get {
+                return ResourceManager.GetString("TbSettingsSrsFilesSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Start on boot 的本地化字符串。
         /// </summary>
         public static string TbSettingsStartBoot {
