@@ -208,7 +208,7 @@ namespace ServiceLib.ViewModels
 
             await ConfigHandler.InitBuiltinRouting(_config);
             await ConfigHandler.InitBuiltinDNS(_config);
-            CoreHandler.Instance.Init(_config, UpdateHandler);
+            await CoreHandler.Instance.Init(_config, UpdateHandler);
             TaskHandler.Instance.RegUpdateTask(_config, UpdateTaskHandler);
 
             if (_config.GuiItem.EnableStatistics)
@@ -389,6 +389,10 @@ namespace ServiceLib.ViewModels
                 RefreshServers();
                 NoticeHandler.Instance.Enqueue(string.Format(ResUI.SuccessfullyImportedServerViaClipboard, ret));
             }
+            else
+            {
+                NoticeHandler.Instance.Enqueue(ResUI.OperationFailed);
+            }
         }
 
         public async Task AddServerViaScanAsync()
@@ -432,6 +436,10 @@ namespace ServiceLib.ViewModels
                     RefreshSubscriptions();
                     RefreshServers();
                     NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedServerViaScan);
+                }
+                else
+                {
+                    NoticeHandler.Instance.Enqueue(ResUI.OperationFailed);
                 }
             }
         }
@@ -566,8 +574,8 @@ namespace ServiceLib.ViewModels
 
         public async Task CloseCore()
         {
-            await ConfigHandler.SaveConfig(_config, false);
-            CoreHandler.Instance.CoreStop();
+            await ConfigHandler.SaveConfig(_config);
+            await CoreHandler.Instance.CoreStop();
         }
 
         private async Task AutoHideStartup()
@@ -588,7 +596,7 @@ namespace ServiceLib.ViewModels
             await ConfigHandler.InitRouting(_config);
             Locator.Current.GetService<StatusBarViewModel>()?.RefreshRoutingsMenu();
 
-            await ConfigHandler.SaveConfig(_config, false);
+            await ConfigHandler.SaveConfig(_config);
             await new UpdateService().UpdateGeoFileAll(_config, UpdateHandler);
             await Reload();
         }
