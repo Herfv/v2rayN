@@ -219,6 +219,7 @@ namespace ServiceLib.ViewModels
 
             await Reload();
             await AutoHideStartup();
+            Locator.Current.GetService<StatusBarViewModel>()?.RefreshRoutingsMenu();
         }
 
         #endregion Init
@@ -530,6 +531,10 @@ namespace ServiceLib.ViewModels
             else if (Utils.IsLinux())
             {
                 Utils.ProcessStart("nautilus", Utils.GetConfigPath());
+            }
+            else if (Utils.IsOSX())
+            {
+                Utils.ProcessStart("open", Utils.GetConfigPath());
             }
         }
 
