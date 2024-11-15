@@ -3176,7 +3176,7 @@ namespace ServiceLib.Resx {
         }
         
         /// <summary>
-        ///   查找类似 The password will only be stored in the local file. 的本地化字符串。
+        ///   查找类似 The password is encrypted and stored only in local files. 的本地化字符串。
         /// </summary>
         public static string TbSettingsLinuxSudoPasswordTip {
             get {
@@ -3694,6 +3694,15 @@ namespace ServiceLib.Resx {
         public static string TipPreSocksPort {
             get {
                 return ResourceManager.GetString("TipPreSocksPort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 XHTTP Extra raw JSON, format: { XHTTPObject } 的本地化字符串。
+        /// </summary>
+        public static string TransportExtraTip {
+            get {
+                return ResourceManager.GetString("TransportExtraTip", resourceCulture);
             }
         }
         
