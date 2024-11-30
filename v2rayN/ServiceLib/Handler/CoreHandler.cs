@@ -97,16 +97,12 @@ namespace ServiceLib.Handler
             {
                 if (_process != null)
                 {
-                    await KillProcess(_process);
-                    _process.Dispose();
-                    _process = null;
+                    _process = await KillProcess(_process);
                 }
 
                 if (_processPre != null)
                 {
-                    await KillProcess(_processPre);
-                    _processPre.Dispose();
-                    _processPre = null;
+                    _processPre = await KillProcess(_processPre);
                 }
 
                 if (_linuxSudoPid > 0)
@@ -125,8 +121,7 @@ namespace ServiceLib.Handler
         {
             try
             {
-                var _p = Process.GetProcessById(pid);
-                await KillProcess(_p);
+                await KillProcess(Process.GetProcessById(pid));
             }
             catch (Exception ex)
             {
@@ -326,32 +321,18 @@ namespace ServiceLib.Handler
             }
         }
 
-        private async Task KillProcess(Process? proc)
+        private async Task<Process?> KillProcess(Process? proc)
         {
             if (proc is null)
             {
-                return;
+                return null;
             }
-            try
-            {
-                proc?.Kill(true);
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
+            try { proc?.Kill(true); } catch { }
+            try { proc?.Close(); } catch { }
+            try { proc?.Dispose(); } catch { }
+
             await Task.Delay(100);
-            if (proc?.HasExited == false)
-            {
-                try
-                {
-                    proc?.Kill();
-                }
-                catch (Exception)
-                {
-                    // ignored
-                }
-            }
+            return null;
         }
 
         #endregion Process
@@ -408,13 +389,13 @@ namespace ServiceLib.Handler
 
             var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             await proc.WaitForExitAsync(timeout.Token);
-            await Task.Delay(1000);
+            await Task.Delay(3000);
         }
 
         private async Task<string> CreateLinuxShellFile(string cmdLine, string fileName)
         {
             //Shell scripts
-            var shFilePath = Utils.GetBinPath(fileName);
+            var shFilePath = Utils.GetBinPath(AppHandler.Instance.IsAdministrator ? "root_" + fileName : fileName);
             File.Delete(shFilePath);
             var sb = new StringBuilder();
             sb.AppendLine("#!/bin/sh");
