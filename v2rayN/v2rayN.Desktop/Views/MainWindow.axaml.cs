@@ -223,6 +223,10 @@ namespace v2rayN.Desktop.Views
                     break;
 
                 case EViewAction.Shutdown:
+                    if (obj != null && _blCloseByUser == false)
+                    {
+                        _blCloseByUser = (bool)obj;
+                    }
                     StorageUI();
                     if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                     {
@@ -330,12 +334,12 @@ namespace v2rayN.Desktop.Views
 
         private void menuPromotion_Click(object? sender, RoutedEventArgs e)
         {
-            Utils.ProcessStart($"{Utils.Base64Decode(Global.PromotionUrl)}?t={DateTime.Now.Ticks}");
+            ProcUtils.ProcessStart($"{Utils.Base64Decode(Global.PromotionUrl)}?t={DateTime.Now.Ticks}");
         }
 
         private void menuSettingsSetUWP_Click(object? sender, RoutedEventArgs e)
         {
-            Utils.ProcessStart(Utils.GetBinPath("EnableLoopback.exe"));
+            ProcUtils.ProcessStart(Utils.GetBinPath("EnableLoopback.exe"));
         }
 
         public async Task ScanScreenTaskAsync()
@@ -481,7 +485,7 @@ namespace v2rayN.Desktop.Views
         {
             if (sender is MenuItem item)
             {
-                Utils.ProcessStart(item.Tag?.ToString());
+                ProcUtils.ProcessStart(item.Tag?.ToString());
             }
         }
 
