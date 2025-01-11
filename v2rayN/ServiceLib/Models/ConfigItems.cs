@@ -102,9 +102,8 @@
         public double MainGirdHeight1 { get; set; }
         public double MainGirdHeight2 { get; set; }
         public EGirdOrientation MainGirdOrientation { get; set; } = EGirdOrientation.Vertical;
-        public bool ColorModeDark { get; set; }
-        public bool FollowSystemTheme { get; set; }
         public string? ColorPrimaryName { get; set; }
+        public string? CurrentTheme { get; set; }
         public string CurrentLanguage { get; set; }
         public string CurrentFontFamily { get; set; }
         public int CurrentFontSize { get; set; }
