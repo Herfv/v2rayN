@@ -389,7 +389,7 @@ namespace v2rayN.Desktop.Views
             _blCloseByUser = true;
             StorageUI();
 
-            await ViewModel?.MyAppExitAsync(false);
+	        await ViewModel?.MyAppExitAsync(false);
         }
 
         #endregion Event
@@ -398,28 +398,32 @@ namespace v2rayN.Desktop.Views
 
         public void ShowHideWindow(bool? blShow)
         {
-            var bl = blShow ?? !_config.UiItem.ShowInTaskbar;
-            if (bl)
-            {
-                this.Show();
-                if (this.WindowState == WindowState.Minimized)
-                {
-                    this.WindowState = WindowState.Normal;
-                }
-                this.Activate();
-                this.Focus();
-            }
-            else
-            {
-                if (_config.UiItem.Hide2TrayWhenClose)
-                {
-                    this.Hide();
-                }
-                else
-                {
-                    this.WindowState = WindowState.Minimized;
-                }
-            }
+	        var bl = blShow ?? (!_config.UiItem.ShowInTaskbar ^ (WindowState==WindowState.Minimized));
+	        if (bl)
+	        {
+		        this.Show();
+		        if (this.WindowState == WindowState.Minimized)
+		        {
+			        this.WindowState = WindowState.Normal;
+		        }
+		        this.Activate();
+		        this.Focus();
+	        }
+	        else
+	        {
+		        if (Utils.IsOSX() || _config.UiItem.Hide2TrayWhenClose)
+		        {
+			        foreach (var ownedWindow in this.OwnedWindows)
+			        {
+				        ownedWindow.Close();
+			        }
+			        this.Hide();
+		        }
+		        else
+		        {
+			        this.WindowState = WindowState.Minimized;
+		        }
+	        }
 
             _config.UiItem.ShowInTaskbar = bl;
         }
