@@ -196,7 +196,7 @@ namespace ServiceLib.Resx {
         }
         
         /// <summary>
-        ///   查找类似 Failed to run Core, please see the log 的本地化字符串。
+        ///   查找类似 Failed to run Core, please check the prompt information 的本地化字符串。
         /// </summary>
         public static string FailedToRunCore {
             get {
@@ -3352,15 +3352,6 @@ namespace ServiceLib.Resx {
         public static string TbSettingsSpeedPingTestUrl {
             get {
                 return ResourceManager.GetString("TbSettingsSpeedPingTestUrl", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Number per time for auto batch during speedtest(max 1000) 的本地化字符串。
-        /// </summary>
-        public static string TbSettingsSpeedTestPageSize {
-            get {
-                return ResourceManager.GetString("TbSettingsSpeedTestPageSize", resourceCulture);
             }
         }
         
