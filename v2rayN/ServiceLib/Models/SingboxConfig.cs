@@ -179,6 +179,9 @@ public class Tls4Sbox
     public List<string>? alpn { get; set; }
     public Utls4Sbox? utls { get; set; }
     public Reality4Sbox? reality { get; set; }
+    public bool? fragment { get; set; }
+    public string? fragment_fallback_delay { get; set; }
+    public bool? record_fragment { get; set; }
 }
 
 public class Multiplex4Sbox
@@ -237,10 +240,13 @@ public class Server4Sbox : BaseServer4Sbox
     public int? server_port { get; set; }
     public string? path { get; set; }
     public Headers4Sbox? headers { get; set; }
+
     // public List<string>? path { get; set; } // hosts
     public Dictionary<string, List<string>>? predefined { get; set; }
+
     // Deprecated
     public string? address { get; set; }
+
     public string? address_resolver { get; set; }
     public string? address_strategy { get; set; }
     public string? strategy { get; set; }

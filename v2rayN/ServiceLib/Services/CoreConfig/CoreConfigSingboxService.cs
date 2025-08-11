@@ -1,11 +1,6 @@
-using System.Collections.Generic;
 using System.Data;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Reactive;
-using System.Text;
-using DynamicData;
-using ServiceLib.Models;
 
 namespace ServiceLib.Services.CoreConfig;
 
@@ -890,6 +885,7 @@ public class CoreConfigSingboxService
                 var tls = new Tls4Sbox()
                 {
                     enabled = true,
+                    record_fragment = _config.CoreBasicItem.EnableFragment,
                     server_name = server_name,
                     insecure = Utils.ToBool(node.AllowInsecure.IsNullOrEmpty() ? _config.CoreBasicItem.DefAllowInsecure.ToString().ToLower() : node.AllowInsecure),
                     alpn = node.GetAlpn(),
