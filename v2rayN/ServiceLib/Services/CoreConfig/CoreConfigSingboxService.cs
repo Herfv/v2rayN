@@ -1862,7 +1862,12 @@ public class CoreConfigSingboxService
                     }
                 }
             }
-            else if (item.OutboundTag == Global.ProxyTag)
+            else if (item.OutboundTag == Global.BlockTag)
+            {
+                rule.action = "predefined";
+                rule.rcode = "NXDOMAIN";
+            }
+            else
             {
                 if (simpleDNSItem.FakeIP == true)
                 {
@@ -1872,12 +1877,6 @@ public class CoreConfigSingboxService
                 }
                 rule.server = Global.SingboxRemoteDNSTag;
                 rule.strategy = string.IsNullOrEmpty(simpleDNSItem.SingboxStrategy4Proxy) ? null : simpleDNSItem.SingboxStrategy4Proxy;
-            }
-            else if (item.OutboundTag == Global.BlockTag)
-            {
-                rule.action = "predefined";
-                rule.rcode = "NOERROR";
-                rule.answer = new List<string> { "A" };
             }
 
             singboxConfig.dns.rules.Add(rule);
