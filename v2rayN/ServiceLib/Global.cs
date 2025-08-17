@@ -305,13 +305,6 @@ public class Global
             ""
     ];
 
-    public static readonly List<string> DomainMatchers =
-    [
-        "linear",
-            "mph",
-            ""
-    ];
-
     public static readonly List<string> Fingerprints =
     [
         "chrome",
@@ -464,9 +457,11 @@ public class Global
     public static readonly List<int> TunMtus =
     [
         1280,
-            1408,
-            1500,
-            9000
+        1408,
+        1500,
+        4064,
+        9000,
+        65535
     ];
 
     public static readonly List<string> TunStacks =
