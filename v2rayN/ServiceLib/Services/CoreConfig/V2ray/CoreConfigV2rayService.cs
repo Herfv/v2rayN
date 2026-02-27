@@ -15,6 +15,10 @@ public partial class CoreConfigV2rayService(CoreConfigContext context)
         var ret = new RetResult();
         try
         {
+            if (context.IsTunEnabled && context.TunProtectSsPort > 0 && context.ProxyRelaySsPort > 0)
+            {
+                return GenerateClientProxyRelayConfig();
+            }
             if (_node == null
                 || !_node.IsValid())
             {
@@ -56,6 +60,12 @@ public partial class CoreConfigV2rayService(CoreConfigContext context)
 
             GenStatistic();
 
+            var finalRule = BuildFinalRule();
+            if (!string.IsNullOrEmpty(finalRule?.balancerTag))
+            {
+                _coreConfig.routing.rules.Add(finalRule);
+            }
+
             ret.Msg = string.Format(ResUI.SuccessfulConfiguration, "");
             ret.Success = true;
             ret.Data = ApplyFullConfigTemplate();
@@ -90,18 +100,8 @@ public partial class CoreConfigV2rayService(CoreConfigContext context)
                 ret.Msg = ResUI.FailedGenDefaultConfiguration;
                 return ret;
             }
-            List<IPEndPoint> lstIpEndPoints = new();
-            List<TcpConnectionInformation> lstTcpConns = new();
-            try
-            {
-                lstIpEndPoints.AddRange(IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners());
-                lstIpEndPoints.AddRange(IPGlobalProperties.GetIPGlobalProperties().GetActiveUdpListeners());
-                lstTcpConns.AddRange(IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpConnections());
-            }
-            catch (Exception ex)
-            {
-                Logging.SaveLog(_tag, ex);
-            }
+
+            var (lstIpEndPoints, lstTcpConns) = Utils.GetActiveNetworkInfo();
 
             GenLog();
             _coreConfig.inbounds.Clear();
@@ -240,6 +240,7 @@ public partial class CoreConfigV2rayService(CoreConfigContext context)
             GenLog();
             GenOutbounds();
 
+            _coreConfig.routing.domainStrategy = Global.AsIs;
             _coreConfig.routing.rules.Clear();
             _coreConfig.inbounds.Clear();
             _coreConfig.inbounds.Add(new()
@@ -250,9 +251,112 @@ public partial class CoreConfigV2rayService(CoreConfigContext context)
                 protocol = EInboundProtocol.mixed.ToString(),
             });
 
+            _coreConfig.routing.rules.Add(BuildFinalRule());
+
             ret.Msg = string.Format(ResUI.SuccessfulConfiguration, "");
             ret.Success = true;
             ret.Data = JsonUtils.Serialize(_coreConfig);
+            return ret;
+        }
+        catch (Exception ex)
+        {
+            Logging.SaveLog(_tag, ex);
+            ret.Msg = ResUI.FailedGenDefaultConfiguration;
+            return ret;
+        }
+    }
+
+    public RetResult GenerateClientProxyRelayConfig()
+    {
+        var ret = new RetResult();
+        try
+        {
+            if (_node == null
+                || !_node.IsValid())
+            {
+                ret.Msg = ResUI.CheckServerSettings;
+                return ret;
+            }
+
+            if (_node.GetNetwork() is nameof(ETransport.quic))
+            {
+                ret.Msg = ResUI.Incorrectconfiguration + $" - {_node.GetNetwork()}";
+                return ret;
+            }
+
+            var result = EmbedUtils.GetEmbedText(Global.V2raySampleClient);
+            if (result.IsNullOrEmpty())
+            {
+                ret.Msg = ResUI.FailedGetDefaultConfiguration;
+                return ret;
+            }
+
+            _coreConfig = JsonUtils.Deserialize<V2rayConfig>(result);
+            if (_coreConfig == null)
+            {
+                ret.Msg = ResUI.FailedGenDefaultConfiguration;
+                return ret;
+            }
+
+            GenLog();
+            _coreConfig.outbounds.Clear();
+            GenOutbounds();
+
+            var protectNode = new ProfileItem()
+            {
+                CoreType = ECoreType.Xray,
+                ConfigType = EConfigType.Shadowsocks,
+                Address = Global.Loopback,
+                Port = context.TunProtectSsPort,
+                Password = Global.None,
+            };
+            protectNode.SetProtocolExtra(protectNode.GetProtocolExtra() with
+            {
+                SsMethod = Global.None,
+            });
+
+            foreach (var outbound in _coreConfig.outbounds.Where(outbound => outbound.streamSettings?.sockopt?.dialerProxy?.IsNullOrEmpty() ?? true))
+            {
+                outbound.streamSettings ??= new StreamSettings4Ray();
+                outbound.streamSettings.sockopt ??= new Sockopt4Ray();
+                outbound.streamSettings.sockopt.dialerProxy = "tun-project-ss";
+            }
+            _coreConfig.outbounds.Add(new CoreConfigV2rayService(context with
+            {
+                Node = protectNode,
+            }).BuildProxyOutbound("tun-project-ss"));
+
+            var hasBalancer = _coreConfig.routing.balancers is { Count: > 0 };
+            _coreConfig.routing.rules =
+            [
+                new()
+                {
+                    inboundTag = new List<string> { "proxy-relay-ss" },
+                    outboundTag = hasBalancer ? null : Global.ProxyTag,
+                    balancerTag = hasBalancer ? Global.ProxyTag + Global.BalancerTagSuffix: null,
+                    type = "field"
+                }
+            ];
+            _coreConfig.inbounds.Clear();
+
+            var configNode = JsonUtils.ParseJson(JsonUtils.Serialize(_coreConfig))!;
+            configNode["inbounds"]!.AsArray().Add(new
+            {
+                listen = Global.Loopback,
+                port = context.ProxyRelaySsPort,
+                protocol = "shadowsocks",
+                settings = new
+                {
+                    network = "tcp,udp",
+                    method = Global.None,
+                    password = Global.None,
+                },
+                tag = "proxy-relay-ss",
+            });
+
+            ret.Msg = string.Format(ResUI.SuccessfulConfiguration, "");
+            ret.Success = true;
+            ret.Data = JsonUtils.Serialize(configNode);
             return ret;
         }
         catch (Exception ex)
