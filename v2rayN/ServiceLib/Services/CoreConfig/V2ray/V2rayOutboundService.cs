@@ -62,7 +62,7 @@ public partial class CoreConfigV2rayService
         try
         {
             var protocolExtra = _node.GetProtocolExtra();
-            var muxEnabled = _node.MuxEnabled ?? _config.CoreBasicItem.MuxEnabled;
+            var muxEnabled = _node.MuxEnabled ?? false;
             switch (_node.ConfigType)
             {
                 case EConfigType.VMess:
@@ -380,7 +380,7 @@ public partial class CoreConfigV2rayService
 
                 TlsSettings4Ray tlsSettings = new()
                 {
-                    allowInsecure = Utils.ToBool(_node.AllowInsecure.IsNullOrEmpty() ? _config.CoreBasicItem.DefAllowInsecure.ToString().ToLower() : _node.AllowInsecure),
+                    allowInsecure = _node.GetAllowInsecure(),
                     alpn = _node.GetAlpn(),
                     fingerprint = _node.Fingerprint.IsNullOrEmpty() ? _config.CoreBasicItem.DefFingerprint : _node.Fingerprint,
                     echConfigList = _node.EchConfigList.NullIfEmpty(),
@@ -465,8 +465,8 @@ public partial class CoreConfigV2rayService
                         [
                             new Mask4Ray
                             {
-                                type = header,
-                                settings = null
+                                type = "mkcp-legacy",
+                                settings = new MaskSettings4Ray { header = header },
                             }
                         ];
                     }
@@ -475,15 +475,15 @@ public partial class CoreConfigV2rayService
                     {
                         kcpFinalmask.udp.Add(new Mask4Ray
                         {
-                            type = "mkcp-original"
+                            type = "mkcp-legacy",
                         });
                     }
                     else
                     {
                         kcpFinalmask.udp.Add(new Mask4Ray
                         {
-                            type = "mkcp-aes128gcm",
-                            settings = new MaskSettings4Ray { password = kcpSeed }
+                            type = "mkcp-legacy",
+                            settings = new MaskSettings4Ray { value = kcpSeed },
                         });
                     }
                     streamSettings.kcpSettings = kcpSettings;

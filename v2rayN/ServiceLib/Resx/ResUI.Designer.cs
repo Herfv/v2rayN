@@ -2113,6 +2113,15 @@ namespace ServiceLib.Resx {
         }
         
         /// <summary>
+        ///   查找类似 Conflict between {0} and {1} 的本地化字符串。
+        /// </summary>
+        public static string MsgOptionsConflict {
+            get {
+                return ResourceManager.GetString("MsgOptionsConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Resolved {0} successfully 的本地化字符串。
         /// </summary>
         public static string MsgParsingSuccessfully {
@@ -2226,6 +2235,15 @@ namespace ServiceLib.Resx {
         public static string MsgSubscriptionPrevProfileNotFound {
             get {
                 return ResourceManager.GetString("MsgSubscriptionPrevProfileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Invalid address in TUN route exclude list: {0} 的本地化字符串。
+        /// </summary>
+        public static string MsgTunRouteExcludeInvalidAddress {
+            get {
+                return ResourceManager.GetString("MsgTunRouteExcludeInvalidAddress", resourceCulture);
             }
         }
         

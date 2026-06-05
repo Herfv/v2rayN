@@ -86,7 +86,7 @@ public class Inboundsettings4Ray
 
     public string? autoOutboundsInterface { get; set; }
 
-    // public List<string>? dns { get; set; }
+    public List<string>? dns { get; set; }
 }
 
 public class UsersItem4Ray
@@ -501,8 +501,10 @@ public class Mask4Ray
 
 public class MaskSettings4Ray
 {
+    public string? header { get; set; }
+    public string? value { get; set; }
+
     public string? password { get; set; }
-    public string? domain { get; set; }
 
     // fragment
     public string? packets { get; set; }
