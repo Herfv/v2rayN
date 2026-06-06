@@ -1,3 +1,4 @@
+using Avalonia.Media;
 using v2rayN.Desktop.Base;
 using v2rayN.Desktop.Common;
 
@@ -82,12 +83,12 @@ public partial class OptionSettingWindow : WindowBase<OptionSettingViewModel>
             this.Bind(ViewModel, vm => vm.HyUpMbps, v => v.txtUpMbps.Text).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.HyDownMbps, v => v.txtDownMbps.Text).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.EnableFragment, v => v.togenableFragment.IsChecked).DisposeWith(disposables);
+            this.Bind(ViewModel, vm => vm.EnableFinalFragment, v => v.togenableFinalFragment.IsChecked).DisposeWith(disposables);
 
             this.Bind(ViewModel, vm => vm.AutoRun, v => v.togAutoRun.IsChecked).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.EnableStatistics, v => v.togEnableStatistics.IsChecked).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.DisplayRealTimeSpeed, v => v.togDisplayRealTimeSpeed.IsChecked).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.KeepOlderDedupl, v => v.togKeepOlderDedupl.IsChecked).DisposeWith(disposables);
-            //this.Bind(ViewModel, vm => vm.EnableAutoAdjustMainLvColWidth, v => v.togEnableAutoAdjustMainLvColWidth.IsChecked).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.AutoHideStartup, v => v.togAutoHideStartup.IsChecked).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.Hide2TrayWhenClose, v => v.togHide2TrayWhenClose.IsChecked).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.MacOSShowInDock, v => v.togMacOSShowInDock.IsChecked).DisposeWith(disposables);
@@ -165,9 +166,10 @@ public partial class OptionSettingWindow : WindowBase<OptionSettingViewModel>
         var lstFonts = new List<string>();
         try
         {
-            var lst = Avalonia.Media.FontManager.Current.SystemFonts
+            var lst = FontManager.Current.SystemFonts
                 .Select(t => t.Name)
-                .Where(t => t.IsNotEmpty())
+                .Append(GetDefaultFontFamilyName())
+                .Where(IsInstalledFontFamilyName)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(t => t)
                 .ToList();
@@ -178,6 +180,20 @@ public partial class OptionSettingWindow : WindowBase<OptionSettingViewModel>
             Logging.SaveLog("GetFonts", ex);
         }
         return lstFonts;
+    }
+
+    private static string GetDefaultFontFamilyName() => "Noto Sans SC";
+
+    private static bool IsInstalledFontFamilyName(string fontFamilyName)
+    {
+        return fontFamilyName.IsNotEmpty()
+               && !IsCssFontFamilyAlias(fontFamilyName);
+    }
+
+    private static bool IsCssFontFamilyAlias(string fontFamilyName)
+    {
+        return fontFamilyName.StartsWith("-", StringComparison.Ordinal)
+               || fontFamilyName.Equals("BlinkMacSystemFont", StringComparison.OrdinalIgnoreCase);
     }
 
     private void ClbdestOverride_SelectionChanged(object? sender, SelectionChangedEventArgs e)
